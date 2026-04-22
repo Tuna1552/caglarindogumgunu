@@ -113,10 +113,27 @@
         }
         .memory-card {
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            break-inside: avoid;
+            margin-bottom: 1.5rem;
         }
         .memory-card:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+        /* Masonry Grid for Photos */
+        .masonry-grid {
+            column-count: 2;
+            column-gap: 1.5rem;
+        }
+        @media (min-width: 768px) {
+            .masonry-grid {
+                column-count: 3;
+            }
+        }
+        @media (min-width: 1024px) {
+            .masonry-grid {
+                column-count: 4;
+            }
         }
         /* Glass Panel Styling */
         .glass-panel {
@@ -131,10 +148,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
-        }
-        /* Envelope Animation Classes */
-        .envelope-transition {
-            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
         }
     </style>
 </head>
@@ -250,41 +263,42 @@
         `;
 
         const memoriesPageContent = `
-            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32">
-                <div class="bg-card-dark rounded-3xl p-6 mb-8 text-center relative overflow-hidden shadow-2xl border border-gray-700 mx-2">
+            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32 px-4">
+                <div class="bg-card-dark rounded-3xl p-6 mb-12 text-center relative overflow-hidden shadow-2xl border border-gray-700">
                     <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
                     <h2 class="text-2xl md:text-3xl font-bold text-primary-blue mb-1 relative z-10">Güzel Anılarımız</h2>
                     <p class="text-xs md:text-lg font-light text-gray-400 relative z-10">
-                        Zaman geçse de bu anlar hep bizimle kalacak...
+                        Yatay veya dikey, tüm anlar tam olduğu gibi...
                     </p>
                 </div>
                 
-                <!-- Masonry-like Grid for many photos -->
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 px-2">
-                    <!-- Fotoğraf 1 -->
-                    <div class="memory-card bg-card-dark rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 shadow-xl group">
-                        <div class="relative aspect-square md:aspect-[3/4] overflow-hidden">
-                            <img src="https://i.ibb.co/X9Zmx2s/ciktfoto.jpg" alt="Anı Fotoğrafı" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-80 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            <div class="absolute bottom-2 left-2 right-2 md:bottom-4 md:left-4 text-left">
-                                <h3 class="text-white font-bold text-[10px] md:text-lg leading-tight">Pi Günü</h3>
-                                <p class="text-gray-300 text-[8px] md:text-xs italic hidden md:block">14 Mart</p>
+                <div class="masonry-grid">
+                    <!-- Yeni Eklenen Yatay Fotoğraf -->
+                    <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
+                        <div class="relative overflow-hidden">
+                            <img src="https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg" alt="Yatay Anı" class="w-full h-auto object-contain">
+                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <p class="text-white font-bold text-sm">Toplu Bir Fotoğraf</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Buraya kopyalayarak 20+ fotoğraf ekleyebilirsin. Örnek boş kart: -->
-                    <div class="memory-card bg-card-dark rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 shadow-xl flex items-center justify-center aspect-square md:aspect-[3/4]">
-                         <div class="text-center p-4">
-                            <i class="fas fa-plus-circle text-xl md:text-4xl mb-2 opacity-20 text-blue-400"></i>
-                            <p class="text-[8px] md:text-sm font-medium text-gray-500 uppercase tracking-widest">Gelecek Anılar</p>
-                         </div>
+                    <!-- Dikey Fotoğraf -->
+                    <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
+                        <div class="relative overflow-hidden">
+                            <img src="https://i.ibb.co/X9Zmx2s/ciktfoto.jpg" alt="Pi Günü" class="w-full h-auto object-contain">
+                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                <p class="text-white font-bold text-sm">Pi Günü - 14 Mart</p>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <!-- Tekrar eden örnek kartlar (Görünümü test etmek için) -->
-                    ${Array(18).fill('').map((_, i) => `
-                        <div class="memory-card bg-card-dark rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 shadow-xl aspect-square md:aspect-[3/4] flex items-center justify-center opacity-40">
-                             <i class="fas fa-camera text-xl md:text-2xl text-gray-700"></i>
+
+                    <!-- Boş ve Sembolik Kartlar -->
+                    ${Array(8).fill('').map((_, i) => `
+                        <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl p-8 flex items-center justify-center opacity-30 group hover:opacity-100 transition-all aspect-square md:aspect-video">
+                             <div class="text-center transition-transform group-hover:scale-110">
+                                <i class="fas fa-camera text-3xl text-gray-600 group-hover:text-blue-500"></i>
+                             </div>
                         </div>
                     `).join('')}
                 </div>
@@ -293,47 +307,32 @@
 
         const messagePageContent = `
             <div class="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in text-center pb-32 pt-4 px-4 min-h-[70vh] justify-center">
-                <!-- Interactive Envelope -->
-                <div id="envelope-wrapper" class="relative w-full max-w-sm aspect-[4/3] group cursor-pointer envelope-transition">
-                    <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-900 rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
-                        <!-- Envelope Flap -->
-                        <div class="absolute top-0 left-0 w-full h-1/2 bg-blue-500/30 origin-top transform group-hover:rotate-x-180 transition-transform duration-700 z-20 border-b border-white/5"></div>
-                        <!-- Decorative Seal -->
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white/10 rounded-full backdrop-blur-xl border border-white/20 flex items-center justify-center z-30 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                            <i class="fas fa-heart text-blue-400 text-2xl animate-pulse"></i>
-                        </div>
-                        <!-- Lines -->
-                        <div class="absolute inset-0 flex flex-col justify-around p-8 opacity-20">
-                            <div class="h-px bg-white w-3/4"></div>
-                            <div class="h-px bg-white w-1/2"></div>
-                            <div class="h-px bg-white w-full"></div>
-                        </div>
+                <!-- Direct Read Message Button (Envelope Removed) -->
+                <div id="envelope-wrapper" class="flex flex-col items-center">
+                    <div class="mb-12 animate-float">
+                        <i class="fas fa-envelope-open-text text-8xl text-primary-blue drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]"></i>
                     </div>
-                    <!-- Label -->
-                    <div class="absolute -bottom-16 left-0 w-full text-center">
-                        <p class="text-blue-300/60 uppercase tracking-[0.3em] text-[10px] font-bold mb-3 animate-bounce-slow">Senin İçin Bir Mesaj Var</p>
-                        <button id="show-message-btn" class="relative px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-black text-white text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 group shadow-xl">
-                            <span class="relative z-10">Mektubu Aç</span>
-                            <div class="absolute inset-0 bg-gradient-to-r from-primary-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-full"></div>
-                        </button>
-                    </div>
+                    
+                    <p class="text-blue-300 uppercase tracking-[0.4em] text-sm font-bold mb-8 opacity-80">Senin İçin Bir Mesaj Var</p>
+                    
+                    <button id="show-message-btn" class="group relative px-16 py-6 bg-primary-blue hover:bg-blue-600 rounded-full font-black text-white text-xl uppercase tracking-[0.2em] transition-all hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(37,99,235,0.4)] overflow-hidden">
+                        <span class="relative z-10">MESAJI OKU</span>
+                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                    </button>
                 </div>
                 
                 <!-- Expanded Letter Content -->
                 <div id="all-messages-container" class="hidden w-full max-w-3xl text-left">
                     <div class="glass-panel rounded-[3rem] p-10 md:p-16 relative overflow-hidden">
-                        <!-- Abstract Background Decoration -->
                         <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-blue/10 rounded-full blur-3xl"></div>
                         <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-accent-blue/10 rounded-full blur-3xl"></div>
                         
-                        <!-- Content -->
                         <div class="relative z-10">
                             <div id="typed-text-content" class="text-gray-200 leading-relaxed text-lg md:text-xl font-light selection:bg-blue-500/30"></div>
                             <div id="signature-area" class="hidden mt-16 pt-10 border-t border-white/10 opacity-0 transition-opacity duration-1000"></div>
                         </div>
                     </div>
                     
-                    <!-- Close/Back Button -->
                     <div class="mt-8 flex justify-center">
                         <button onclick="renderPage('message')" class="text-gray-500 hover:text-gray-300 text-xs uppercase tracking-widest transition-colors flex items-center">
                             <i class="fas fa-redo-alt mr-2 text-[10px]"></i> Yeniden Oku
@@ -440,7 +439,6 @@
                 await new Promise(r => setTimeout(r, 200));
             }
 
-            // Signature area
             signatureArea.classList.remove('hidden');
             signatureArea.innerHTML = `
                 <div class="flex flex-col items-end text-right">
@@ -459,17 +457,18 @@
             const box = document.getElementById('all-messages-container');
             
             const openAction = () => {
-                wrapper.style.transform = "scale(1.2) translateY(-20px)";
-                wrapper.style.opacity = "0";
-                setTimeout(() => {
-                    wrapper.classList.add('hidden');
-                    box.classList.remove('hidden');
-                    typeMessage();
-                }, 600);
+                if (wrapper) {
+                    wrapper.style.transform = "scale(0.8)";
+                    wrapper.style.opacity = "0";
+                    setTimeout(() => {
+                        wrapper.classList.add('hidden');
+                        box.classList.remove('hidden');
+                        typeMessage();
+                    }, 500);
+                }
             };
 
-            if (btn) btn.onclick = (e) => { e.stopPropagation(); openAction(); };
-            if (wrapper) wrapper.onclick = openAction;
+            if (btn) btn.onclick = openAction;
         }
 
         function createHeartButtons() {
