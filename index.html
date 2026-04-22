@@ -262,43 +262,40 @@
             </div>
         `;
 
+        const photoUrls = [
+            "https://i.ibb.co/ksMjVtwz/vesikal-k-a-lar.jpg",
+            "https://i.ibb.co/9H2V4KHb/ismetcaglar2.png",
+            "https://i.ibb.co/jP10t1Rk/caglarismet3.png",
+            "https://i.ibb.co/mrPWCdKv/1.jpg",
+            "https://i.ibb.co/V0ZMqyF7/2.jpg",
+            "https://i.ibb.co/NhYQgtB/3.jpg",
+            "https://i.ibb.co/YTVSmV8H/4.jpg",
+            "https://i.ibb.co/39n1yB0J/5.jpg",
+            "https://i.ibb.co/TMY0m51h/6.jpg",
+            "https://i.ibb.co/pmZR3Mn/7.jpg",
+            "https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg",
+            "https://i.ibb.co/X9Zmx2s/ciktfoto.jpg"
+        ];
+
         const memoriesPageContent = `
             <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32 px-4">
                 <div class="bg-card-dark rounded-3xl p-6 mb-12 text-center relative overflow-hidden shadow-2xl border border-gray-700">
                     <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
                     <h2 class="text-2xl md:text-3xl font-bold text-primary-blue mb-1 relative z-10">Güzel Anılarımız</h2>
                     <p class="text-xs md:text-lg font-light text-gray-400 relative z-10">
-                        Yatay veya dikey, tüm anlar tam olduğu gibi...
+                        Birlikte geçirdiğimiz her saniye çok değerli...
                     </p>
                 </div>
                 
                 <div class="masonry-grid">
-                    <!-- Yeni Eklenen Yatay Fotoğraf -->
-                    <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
-                        <div class="relative overflow-hidden">
-                            <img src="https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg" alt="Yatay Anı" class="w-full h-auto object-contain">
-                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                <p class="text-white font-bold text-sm">Toplu Bir Fotoğraf</p>
+                    ${photoUrls.map((url, i) => `
+                        <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
+                            <div class="relative overflow-hidden">
+                                <img src="${url}" alt="Anı ${i+1}" class="w-full h-auto object-contain">
+                                <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                                    <p class="text-white font-bold text-sm">Anı #${i+1}</p>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Dikey Fotoğraf -->
-                    <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
-                        <div class="relative overflow-hidden">
-                            <img src="https://i.ibb.co/X9Zmx2s/ciktfoto.jpg" alt="Pi Günü" class="w-full h-auto object-contain">
-                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                <p class="text-white font-bold text-sm">Pi Günü - 14 Mart</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Boş ve Sembolik Kartlar -->
-                    ${Array(8).fill('').map((_, i) => `
-                        <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl p-8 flex items-center justify-center opacity-30 group hover:opacity-100 transition-all aspect-square md:aspect-video">
-                             <div class="text-center transition-transform group-hover:scale-110">
-                                <i class="fas fa-camera text-3xl text-gray-600 group-hover:text-blue-500"></i>
-                             </div>
                         </div>
                     `).join('')}
                 </div>
