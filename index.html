@@ -33,6 +33,7 @@
                         'light-up': 'lightUp 0.5s ease-out forwards',
                         'float': 'float 3s ease-in-out infinite',
                         'shine': 'shine 2s infinite',
+                        'bounce-slow': 'bounce 3s infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -111,11 +112,29 @@
             background: #2563eb;
         }
         .memory-card {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .memory-card:hover {
-            transform: scale(1.02) translateY(-10px);
-            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2);
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.15);
+        }
+        /* Glass Panel Styling */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .signature-gradient {
+            background: linear-gradient(to right, #60a5fa, #f1f5f9, #38bdf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+        /* Envelope Animation Classes */
+        .envelope-transition {
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
         }
     </style>
 </head>
@@ -145,7 +164,7 @@
 
         <!-- Main Application Container -->
         <div id="app-container" class="hidden flex-1 flex flex-col p-4 md:p-8 relative">
-            <div id="content-area" class="flex-1 flex flex-col items-center justify-center text-center p-4"></div>
+            <div id="content-area" class="flex-1 flex flex-col items-center justify-center text-center p-2 md:p-4 w-full"></div>
 
             <!-- Mobile Navigation -->
             <nav class="fixed bottom-0 left-0 w-full bg-card-dark bg-opacity-90 backdrop-blur-lg border-t border-gray-700 flex justify-around items-center h-16 shadow-2xl z-20 md:hidden">
@@ -200,30 +219,30 @@
         const particleColors = ['#2563eb', '#60a5fa', '#38bdf8', '#0ea5e9'];
 
         const homePageContent = `
-            <div class="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl">
+            <div class="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl animate-fade-in">
                 <div class="flex-1 text-center md:text-left md:pr-8 mb-8 md:mb-0">
-                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-primary-blue animate-fade-in drop-shadow-xl">
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-primary-blue drop-shadow-xl">
                         İyi ki Doğdun, Çağlar!
                     </h1>
-                    <p id="countdown-text" class="mt-4 text-xl md:text-3xl lg:text-4xl font-light text-text-light animate-fade-in delay-200">
+                    <p id="countdown-text" class="mt-4 text-xl md:text-3xl lg:text-4xl font-light text-text-light">
                         26 Nisan 2026'ya sadece...
                     </p>
                 </div>
-                <div class="flex-1 grid grid-cols-2 gap-4 w-full animate-fade-in delay-300">
+                <div class="flex-1 grid grid-cols-2 gap-4 w-full">
                     <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
-                        <span id="days" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span id="days" class="text-4xl md:text-6xl font-extrabold text-accent-blue tabular-nums">0</span>
                         <span class="text-xs text-gray-400 mt-2 text-center">GÜN</span>
                     </div>
                     <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
-                        <span id="hours" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span id="hours" class="text-4xl md:text-6xl font-extrabold text-accent-blue tabular-nums">0</span>
                         <span class="text-xs text-gray-400 mt-2 text-center">SAAT</span>
                     </div>
                     <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
-                        <span id="minutes" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span id="minutes" class="text-4xl md:text-6xl font-extrabold text-accent-blue tabular-nums">0</span>
                         <span class="text-xs text-gray-400 mt-2 text-center">DAKİKA</span>
                     </div>
                     <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
-                        <span id="seconds" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span id="seconds" class="text-4xl md:text-6xl font-extrabold text-accent-blue tabular-nums">0</span>
                         <span class="text-xs text-gray-400 mt-2 text-center">SANİYE</span>
                     </div>
                 </div>
@@ -231,67 +250,94 @@
         `;
 
         const memoriesPageContent = `
-            <div class="w-full max-w-5xl animate-fade-in pb-24">
-                <div class="bg-card-dark rounded-3xl p-6 mb-12 text-center relative overflow-hidden shadow-2xl border border-gray-700">
+            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32">
+                <div class="bg-card-dark rounded-3xl p-6 mb-8 text-center relative overflow-hidden shadow-2xl border border-gray-700 mx-2">
                     <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
-                    <h2 class="text-3xl font-bold text-primary-blue mb-4 relative z-10">Güzel Anılarımız</h2>
-                    <p class="text-lg font-light text-gray-300 relative z-10">
-                        Zaman geçsede bu anlar hep bizimle kalacak...
+                    <h2 class="text-2xl md:text-3xl font-bold text-primary-blue mb-1 relative z-10">Güzel Anılarımız</h2>
+                    <p class="text-xs md:text-lg font-light text-gray-400 relative z-10">
+                        Zaman geçse de bu anlar hep bizimle kalacak...
                     </p>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Fotoğraf Kartı -->
-                    <div class="memory-card bg-card-dark rounded-[2rem] overflow-hidden border border-white/5 shadow-xl group">
-                        <div class="relative aspect-[3/4] overflow-hidden">
-                            <img src="https://i.ibb.co/X9Zmx2s/ciktfoto.jpg" alt="Anı Fotoğrafı" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark via-transparent to-transparent opacity-60"></div>
-                            <div class="absolute bottom-4 left-4 right-4 text-left">
-                                <span class="bg-primary-blue/80 backdrop-blur-md text-[10px] px-2 py-1 rounded-full text-white font-bold uppercase tracking-wider mb-2 inline-block">Hatıra</span>
-                                <h3 class="text-white font-bold text-lg leading-tight">Pi Günü</h3>
+                <!-- Masonry-like Grid for many photos -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6 px-2">
+                    <!-- Fotoğraf 1 -->
+                    <div class="memory-card bg-card-dark rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 shadow-xl group">
+                        <div class="relative aspect-square md:aspect-[3/4] overflow-hidden">
+                            <img src="https://i.ibb.co/X9Zmx2s/ciktfoto.jpg" alt="Anı Fotoğrafı" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-80 md:opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            <div class="absolute bottom-2 left-2 right-2 md:bottom-4 md:left-4 text-left">
+                                <h3 class="text-white font-bold text-[10px] md:text-lg leading-tight">Pi Günü</h3>
+                                <p class="text-gray-300 text-[8px] md:text-xs italic hidden md:block">14 Mart</p>
                             </div>
-                        </div>
-                        <div class="p-4 text-left">
-                            <p class="text-gray-400 text-sm italic">"14 Mart Gününden Tatlı Bir Kare"</p>
                         </div>
                     </div>
 
-                    <!-- Placeholder for next memories -->
-                    <div class="border-2 border-dashed border-gray-700 rounded-[2.5rem] flex flex-col items-center justify-center p-8 text-gray-600">
-                        <i class="fas fa-plus-circle text-4xl mb-3 opacity-20"></i>
-                        <p class="text-sm font-medium">Yeni anılar yakında...</p>
+                    <!-- Buraya kopyalayarak 20+ fotoğraf ekleyebilirsin. Örnek boş kart: -->
+                    <div class="memory-card bg-card-dark rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 shadow-xl flex items-center justify-center aspect-square md:aspect-[3/4]">
+                         <div class="text-center p-4">
+                            <i class="fas fa-plus-circle text-xl md:text-4xl mb-2 opacity-20 text-blue-400"></i>
+                            <p class="text-[8px] md:text-sm font-medium text-gray-500 uppercase tracking-widest">Gelecek Anılar</p>
+                         </div>
                     </div>
+                    
+                    <!-- Tekrar eden örnek kartlar (Görünümü test etmek için) -->
+                    ${Array(18).fill('').map((_, i) => `
+                        <div class="memory-card bg-card-dark rounded-2xl md:rounded-[2rem] overflow-hidden border border-white/5 shadow-xl aspect-square md:aspect-[3/4] flex items-center justify-center opacity-40">
+                             <i class="fas fa-camera text-xl md:text-2xl text-gray-700"></i>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         `;
 
         const messagePageContent = `
-            <div class="w-full max-w-3xl mx-auto flex flex-col items-center animate-fade-in text-center pb-32 pt-8">
-                <div class="relative mb-10 group">
-                    <div class="absolute -inset-2 bg-gradient-to-r from-primary-blue to-accent-blue rounded-full opacity-75 blur group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse"></div>
-                    <div class="relative bg-card-dark w-24 h-24 rounded-full flex items-center justify-center shadow-2xl border border-gray-700">
-                        <i class="fas fa-heart text-4xl text-primary-blue animate-float"></i>
+            <div class="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in text-center pb-32 pt-4 px-4 min-h-[70vh] justify-center">
+                <!-- Interactive Envelope -->
+                <div id="envelope-wrapper" class="relative w-full max-w-sm aspect-[4/3] group cursor-pointer envelope-transition">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-900 rounded-2xl shadow-2xl border border-white/10 overflow-hidden">
+                        <!-- Envelope Flap -->
+                        <div class="absolute top-0 left-0 w-full h-1/2 bg-blue-500/30 origin-top transform group-hover:rotate-x-180 transition-transform duration-700 z-20 border-b border-white/5"></div>
+                        <!-- Decorative Seal -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white/10 rounded-full backdrop-blur-xl border border-white/20 flex items-center justify-center z-30 shadow-inner group-hover:scale-110 transition-transform duration-500">
+                            <i class="fas fa-heart text-blue-400 text-2xl animate-pulse"></i>
+                        </div>
+                        <!-- Lines -->
+                        <div class="absolute inset-0 flex flex-col justify-around p-8 opacity-20">
+                            <div class="h-px bg-white w-3/4"></div>
+                            <div class="h-px bg-white w-1/2"></div>
+                            <div class="h-px bg-white w-full"></div>
+                        </div>
+                    </div>
+                    <!-- Label -->
+                    <div class="absolute -bottom-16 left-0 w-full text-center">
+                        <p class="text-blue-300/60 uppercase tracking-[0.3em] text-[10px] font-bold mb-3 animate-bounce-slow">Senin İçin Bir Mesaj Var</p>
+                        <button id="show-message-btn" class="relative px-10 py-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-black text-white text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 group shadow-xl">
+                            <span class="relative z-10">Mektubu Aç</span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-primary-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-full"></div>
+                        </button>
                     </div>
                 </div>
                 
-                <div id="message-container-wrapper" class="w-full px-4">
-                    <button id="show-message-btn" class="w-full py-6 rounded-3xl font-black text-white text-xl bg-gradient-to-r from-primary-blue to-secondary-blue hover:from-secondary-blue hover:to-primary-blue transition-all duration-500 shadow-2xl border border-white/10 group overflow-hidden relative">
-                        <span class="relative z-10 flex items-center justify-center uppercase tracking-widest">
-                            <i class="fas fa-envelope-open-text mr-3 text-2xl group-hover:rotate-12 transition-transform"></i> 
-                            Sana Özel Notu Oku
-                        </span>
-                        <div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    </button>
-                    
-                    <div id="all-messages-container" class="hidden relative">
-                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gradient-to-b from-primary-blue/50 to-transparent"></div>
-                        <div class="bg-card-dark/80 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 text-left shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 relative overflow-hidden">
-                            <div class="absolute top-0 right-0 p-8 opacity-5">
-                                <i class="fas fa-quote-right text-8xl text-white"></i>
-                            </div>
-                            <div id="typed-text-content" class="relative z-10"></div>
-                            <div id="signature-area" class="hidden mt-12 pt-8 border-t border-white/5 relative z-10"></div>
+                <!-- Expanded Letter Content -->
+                <div id="all-messages-container" class="hidden w-full max-w-3xl text-left">
+                    <div class="glass-panel rounded-[3rem] p-10 md:p-16 relative overflow-hidden">
+                        <!-- Abstract Background Decoration -->
+                        <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-blue/10 rounded-full blur-3xl"></div>
+                        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-accent-blue/10 rounded-full blur-3xl"></div>
+                        
+                        <!-- Content -->
+                        <div class="relative z-10">
+                            <div id="typed-text-content" class="text-gray-200 leading-relaxed text-lg md:text-xl font-light selection:bg-blue-500/30"></div>
+                            <div id="signature-area" class="hidden mt-16 pt-10 border-t border-white/10 opacity-0 transition-opacity duration-1000"></div>
                         </div>
+                    </div>
+                    
+                    <!-- Close/Back Button -->
+                    <div class="mt-8 flex justify-center">
+                        <button onclick="renderPage('message')" class="text-gray-500 hover:text-gray-300 text-xs uppercase tracking-widest transition-colors flex items-center">
+                            <i class="fas fa-redo-alt mr-2 text-[10px]"></i> Yeniden Oku
+                        </button>
                     </div>
                 </div>
             </div>
@@ -374,13 +420,12 @@
             const signatureArea = document.getElementById('signature-area');
             
             const lines = [
-                { text: "Merhaba Çağlar,", style: "text-2xl font-bold mb-6 text-primary-blue" },
-                { text: "Bugün senin doğum günün... Arkadaşların olarak her anında yanında olacağımızı bilmen adına böyle bir site yapmak istedik, umarız beğenmişsindir. ✨", style: "text-lg mb-4 text-gray-200 leading-relaxed" },
-                { text: "Senin gibi dürüst, içten ve değerli birini tanımış olmak bizim için gerçekten büyük ve güzel bir şans. Doğum gününü en içten dileklerimizle kutluyoruz ve her zaman mutluluğunu diliyoruz. 🍀", style: "text-lg mb-4 text-gray-200 leading-relaxed" },
-                { text: "Doğruları konuşmak gerekirse; kalbinin güzelliği hem yüzüne hem de mizahına vurmuş. Çok eğlenceli, güzel ve sevdiklerine değer veren birisin. Bu yüzden varlığın gerçekten içimizi ısıtıyor. 🔥", style: "text-lg mb-4 text-gray-200 leading-relaxed" },
-                { text: "Kendi adıma (Tuna) konuşacak olursam; ne zaman moralim bozuk olsa beni bir şekilde güldürmeyi başardığın için sana tüm içtenliğimle teşekkür ederim. İyi ki arkadaşımsın, iyi ki arkadaşımızsın. 🙌", style: "text-lg mb-4 text-gray-200 leading-relaxed p-4 bg-white/5 rounded-2xl border-l-4 border-primary-blue italic" },
-                { text: "Ve son olarak; bizler için çok değerli bir arkadaş olduğunu ve her zaman öyle olacağını hiçbir zaman unutma. 💎", style: "text-lg mb-4 text-gray-200 leading-relaxed" },
-                { text: "İyi ki varsın Çağlar, iyi ki doğmuşsun, iyi ki seninle tanışmışız ve iyi ki bizimlesin. Daha nice yaşlar diliyorum ve yanaklarından öpüyorum. 🎂", style: "text-lg mb-4 text-gray-200 leading-relaxed font-semibold" }
+                { text: "Merhaba Çağlar,", style: "text-3xl font-extrabold mb-10 text-white tracking-tight" },
+                { text: "Bugün senin doğum günün... Arkadaşların olarak her anında yanında olacağımızı bilmen adına böyle bir site yapmak istedik, umarız beğenmişsindir.", style: "mb-6 italic text-blue-200" },
+                { text: "Senin gibi dürüst, içten ve değerli birini tanımış olmak bizim için gerçekten büyük ve güzel bir şans. Doğum gününü en içten dileklerimizle kutluyoruz ve her zaman mutluluğunu diliyoruz.", style: "mb-6" },
+                { text: "Doğruları konuşmak gerekirse; kalbinin güzelliği hem yüzüne hem de mizahına vurmuş. Çok eğlenceli, güzel ve sevdiklerine değer veren birisin. Bu yüzden varlığın gerçekten içimizi ısıtıyor.", style: "mb-6 font-medium" },
+                { text: "Ne zaman moralimiz bozuk olsa bizi bir şekilde güldürmeyi başardığın için sana tüm içtenliğimizle teşekkür ederiz. İyi ki arkadaşımızsın.", style: "mb-6" },
+                { text: "Bizler için çok değerli bir arkadaş olduğunu ve her zaman öyle olacağını hiçbir zaman unutma. 💎 İyi ki varsın Çağlar, iyi ki doğmuşsun, iyi ki seninle tanışmışız ve iyi ki bizimlesin. Daha nice yaşlar diliyoruz.", style: "text-blue-100 font-semibold mb-6" }
             ];
 
             container.innerHTML = "";
@@ -390,43 +435,48 @@
                 container.appendChild(p);
                 for (let char of lineObj.text) {
                     p.innerHTML += char;
-                    await new Promise(r => setTimeout(r, 35));
+                    await new Promise(r => setTimeout(r, 20));
                 }
-                await new Promise(r => setTimeout(r, 400));
+                await new Promise(r => setTimeout(r, 200));
             }
 
             // Signature area
             signatureArea.classList.remove('hidden');
-            signatureArea.classList.add('animate-fade-in');
             signatureArea.innerHTML = `
-                <div class="flex flex-col items-end">
-                    <span class="text-sm text-gray-400 mb-2 uppercase tracking-widest font-bold">Sevgilerimizle,</span>
-                    <h3 class="font-cursive text-3xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-secondary-blue via-white to-accent-blue drop-shadow-[0_0_15px_rgba(56,189,248,0.5)] leading-snug">
-                        Tuna, İsmet, Kumsal ve Benna...
+                <div class="flex flex-col items-end text-right">
+                    <span class="text-[10px] text-blue-400 uppercase tracking-[0.6em] mb-4 font-black">Sonsuz Sevgilerimizle</span>
+                    <h3 class="font-cursive text-4xl md:text-6xl signature-gradient py-2">
+                        Tuna, İsmet, Kumsal ve Benna
                     </h3>
                 </div>
             `;
+            setTimeout(() => signatureArea.style.opacity = '1', 100);
         }
 
         function attachMessageButtonListener() {
+            const wrapper = document.getElementById('envelope-wrapper');
             const btn = document.getElementById('show-message-btn');
             const box = document.getElementById('all-messages-container');
-            if (btn) btn.onclick = () => {
-                btn.style.transform = "scale(0.95)";
-                btn.style.opacity = "0";
+            
+            const openAction = () => {
+                wrapper.style.transform = "scale(1.2) translateY(-20px)";
+                wrapper.style.opacity = "0";
                 setTimeout(() => {
-                    btn.classList.add('hidden');
+                    wrapper.classList.add('hidden');
                     box.classList.remove('hidden');
                     typeMessage();
-                }, 400);
+                }, 600);
             };
+
+            if (btn) btn.onclick = (e) => { e.stopPropagation(); openAction(); };
+            if (wrapper) wrapper.onclick = openAction;
         }
 
         function createHeartButtons() {
             heartGrid.innerHTML = '';
             for (let i = 0; i < heartButtonCount; i++) {
                 const b = document.createElement('button');
-                b.className = 'star-btn aspect-square bg-gray-700 rounded-full flex items-center justify-center text-2xl text-primary-blue hover:bg-gray-600 transition-all';
+                b.className = 'star-btn aspect-square bg-gray-700 rounded-full flex items-center justify-center text-2xl text-primary-blue hover:bg-gray-600 transition-all active:scale-90';
                 b.innerHTML = '<i class="fas fa-star"></i>';
                 b.onclick = () => {
                     if (isPlaying) return;
@@ -471,8 +521,10 @@
         };
 
         ['home', 'memories', 'message'].forEach(p => {
-            document.getElementById('nav-' + p).onclick = () => renderPage(p);
-            document.getElementById('nav-' + p + '-desktop').onclick = () => renderPage(p);
+            const el = document.getElementById('nav-' + p);
+            const elD = document.getElementById('nav-' + p + '-desktop');
+            if(el) el.onclick = () => renderPage(p);
+            if(elD) elD.onclick = () => renderPage(p);
         });
 
         window.onload = () => {
