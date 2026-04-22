@@ -96,6 +96,11 @@
             background: #2563eb;
             border-radius: 10px;
         }
+        /* Yıldız butonlarının mobilde ve masaüstünde düzgün görünmesi için */
+        .star-btn {
+            min-height: 50px;
+            min-width: 50px;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -110,7 +115,7 @@
                 <p class="text-md text-gray-400 mb-6 font-light">
                     Siteye girmek için mavi yıldızları doğru sırayla takip et (yoğun güvenlikli)
                 </p>
-                <div id="heart-grid" class="grid grid-cols-3 gap-4 max-w-xs mx-auto mb-6 min-h-[150px]">
+                <div id="heart-grid" class="grid grid-cols-3 gap-4 max-w-xs mx-auto mb-6">
                     <!-- Butonlar JS ile eklenecek -->
                 </div>
                 <button id="start-button" class="w-full py-3 rounded-2xl font-bold text-white bg-gradient-to-r from-primary-blue to-accent-blue hover:from-accent-blue hover:to-primary-blue transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -173,12 +178,16 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let user = null;
 
-        // Kimlik Doğrulama (RULE 3)
+        // Kimlik Doğrulama
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth error:", err);
             }
         };
         initAuth();
@@ -253,7 +262,6 @@
             <div class="w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-in text-center">
                 <h1 class="text-3xl font-extrabold text-white mb-6">Çağlar'a Mesaj Bırak</h1>
                 
-                <!-- Mesaj Gönderme Formu -->
                 <div class="w-full bg-card-dark p-6 rounded-3xl border border-gray-700 shadow-xl mb-8">
                     <input id="sender-name" type="text" placeholder="Adınız" class="w-full bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-primary-blue">
                     <textarea id="sender-message" placeholder="Mesajınız..." class="w-full bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-primary-blue h-24"></textarea>
@@ -262,7 +270,6 @@
                     </button>
                 </div>
 
-                <!-- Mesaj Listesi -->
                 <div id="messages-display" class="w-full space-y-4 text-left max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                     <div class="text-gray-500 italic py-10 text-center">Mesajlar yükleniyor...</div>
                 </div>
@@ -337,14 +344,15 @@
                 const h = Math.floor((distance % 86400000) / 3600000);
                 const m = Math.floor((distance % 3600000) / 60000);
                 const s = Math.floor((distance % 60000) / 1000);
-                ['days', 'hours', 'minutes', 'seconds'].forEach((id, i) => {
+                const ids = ['days', 'hours', 'minutes', 'seconds'];
+                const values = [d, h, m, s];
+                ids.forEach((id, i) => {
                     const el = document.getElementById(id);
-                    if (el) el.innerText = [d, h, m, s][i];
+                    if (el) el.innerText = values[i];
                 });
             }
         }
 
-        // İnteraktif Mesaj Sistemi Mantığı
         function initMessageSystem() {
             const sendBtn = document.getElementById('send-message-btn');
             const nameInput = document.getElementById('sender-name');
@@ -353,22 +361,18 @@
 
             if (!user) return;
 
-            // RULE 1 Path
             const msgCol = collection(db, 'artifacts', appId, 'public', 'data', 'birthday_messages');
 
-            // Mesajları Dinle (Real-time)
             onSnapshot(msgCol, (snapshot) => {
                 const messages = [];
                 snapshot.forEach(doc => messages.push(doc.data()));
-                
-                // RULE 2: Bellekte sıralama
                 messages.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
 
                 if (messages.length === 0) {
                     display.innerHTML = '<div class="text-gray-500 italic py-10 text-center">Henüz mesaj yok. İlk yazan sen ol!</div>';
                 } else {
                     display.innerHTML = messages.map(m => `
-                        <div class="bg-slate-800/50 p-5 rounded-2xl border border-gray-700 animate-fade-in">
+                        <div class="bg-slate-800/50 p-5 rounded-2xl border border-gray-700 animate-fade-in mb-4">
                             <div class="flex justify-between items-center mb-2">
                                 <span class="font-bold text-accent-blue">${m.name}</span>
                                 <span class="text-[10px] text-gray-500">${m.timestamp ? new Date(m.timestamp.seconds * 1000).toLocaleDateString('tr-TR') : 'Az önce'}</span>
@@ -377,18 +381,12 @@
                         </div>
                     `).join('');
                 }
-            }, (error) => {
-                console.error("Firestore error:", error);
-            });
+            }, (error) => console.error(error));
 
-            // Mesaj Gönder
             sendBtn.onclick = async () => {
                 const name = nameInput.value.trim();
                 const text = msgInput.value.trim();
-
-                if (!name || !text) {
-                    return;
-                }
+                if (!name || !text) return;
 
                 sendBtn.disabled = true;
                 sendBtn.innerText = "Gönderiliyor...";
@@ -403,7 +401,7 @@
                     nameInput.value = "";
                     msgInput.value = "";
                 } catch (e) {
-                    console.error("Gönderim hatası:", e);
+                    console.error(e);
                 } finally {
                     sendBtn.disabled = false;
                     sendBtn.innerHTML = 'Gönder <i class="fas fa-paper-plane ml-2"></i>';
@@ -412,16 +410,18 @@
         }
 
         function createHeartButtons() {
+            // Grid'i temizle ve butonları oluştur
             heartGrid.innerHTML = '';
             for (let i = 0; i < heartButtonCount; i++) {
                 const b = document.createElement('button');
-                b.className = 'star-btn aspect-square bg-gray-700 rounded-full flex items-center justify-center text-2xl text-primary-blue hover:bg-gray-600 transition-all';
+                b.className = 'star-btn aspect-square bg-slate-700 rounded-full flex items-center justify-center text-2xl text-primary-blue hover:bg-slate-600 transition-all shadow-inner border border-slate-600';
                 b.innerHTML = '<i class="fas fa-star"></i>';
                 b.onclick = () => {
                     if (isPlaying) return;
                     userSequence.push(i);
                     b.classList.add('lighted-star');
                     setTimeout(() => b.classList.remove('lighted-star'), 400);
+                    
                     if (userSequence.length === sequence.length) {
                         if (userSequence.every((v, j) => v === sequence[j])) {
                             passwordPage.classList.add('password-page-hidden');
@@ -442,15 +442,20 @@
         }
 
         startButton.onclick = () => {
+            if (isPlaying) return;
             sequence = Array.from({length: 4}, () => Math.floor(Math.random() * 9));
+            userSequence = [];
             isPlaying = true;
             let step = 0;
             const btns = document.querySelectorAll('.star-btn');
+            
             const interval = setInterval(() => {
                 if (step < sequence.length) {
                     const b = btns[sequence[step]];
-                    b.classList.add('lighted-star');
-                    setTimeout(() => b.classList.remove('lighted-star'), 500);
+                    if (b) {
+                        b.classList.add('lighted-star');
+                        setTimeout(() => b.classList.remove('lighted-star'), 500);
+                    }
                     step++;
                 } else {
                     clearInterval(interval);
