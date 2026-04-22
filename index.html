@@ -306,36 +306,42 @@
         `;
 
         const messagePageContent = `
-            <div class="w-full max-w-4xl mx-auto flex flex-col items-center animate-fade-in text-center pb-32 pt-4 px-4 min-h-[70vh] justify-center">
-                <!-- Direct Read Message Button (Envelope Removed) -->
+            <div class="w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-in text-center pb-24 pt-6 px-4 min-h-[60vh] justify-center">
+                <!-- Message Box Container -->
                 <div id="envelope-wrapper" class="flex flex-col items-center">
-                    <div class="mb-12 animate-float">
-                        <i class="fas fa-envelope-open-text text-8xl text-primary-blue drop-shadow-[0_0_15px_rgba(37,99,235,0.5)]"></i>
+                    <div class="mb-8 animate-float">
+                        <i class="fas fa-envelope-open-text text-6xl text-primary-blue drop-shadow-[0_0_10px_rgba(37,99,235,0.4)]"></i>
                     </div>
                     
-                    <p class="text-blue-300 uppercase tracking-[0.4em] text-sm font-bold mb-8 opacity-80">Senin İçin Bir Mesaj Var</p>
+                    <p class="text-blue-300 uppercase tracking-[0.3em] text-[10px] font-bold mb-6 opacity-70">Senin İçin Bir Not Bırakıldı</p>
                     
-                    <button id="show-message-btn" class="group relative px-16 py-6 bg-primary-blue hover:bg-blue-600 rounded-full font-black text-white text-xl uppercase tracking-[0.2em] transition-all hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(37,99,235,0.4)] overflow-hidden">
+                    <button id="show-message-btn" class="group relative px-10 py-4 bg-primary-blue hover:bg-blue-600 rounded-full font-black text-white text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-xl shadow-blue-900/20 overflow-hidden">
                         <span class="relative z-10">MESAJI OKU</span>
-                        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                        <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                     </button>
                 </div>
                 
                 <!-- Expanded Letter Content -->
-                <div id="all-messages-container" class="hidden w-full max-w-3xl text-left">
-                    <div class="glass-panel rounded-[3rem] p-10 md:p-16 relative overflow-hidden">
-                        <div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-blue/10 rounded-full blur-3xl"></div>
-                        <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-accent-blue/10 rounded-full blur-3xl"></div>
-                        
+                <div id="all-messages-container" class="hidden w-full max-w-2xl text-left">
+                    <div class="glass-panel rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden">
                         <div class="relative z-10">
-                            <div id="typed-text-content" class="text-gray-200 leading-relaxed text-lg md:text-xl font-light selection:bg-blue-500/30"></div>
-                            <div id="signature-area" class="hidden mt-16 pt-10 border-t border-white/10 opacity-0 transition-opacity duration-1000"></div>
+                            <div id="typed-text-content" class="text-gray-200 leading-relaxed text-sm md:text-base font-light tracking-wide space-y-4"></div>
+                            
+                            <div id="signature-area" class="hidden mt-12 pt-10 border-t border-white/5 opacity-0 transition-opacity duration-1000 text-center">
+                                <p class="text-[9px] text-blue-400 uppercase tracking-[0.4em] mb-4 font-bold opacity-60">Sonsuz Sevgilerimizle</p>
+                                <div class="inline-block relative">
+                                    <h3 class="font-cursive text-3xl md:text-4xl signature-gradient py-2">
+                                        Tuna, İsmet, Kumsal ve Benna
+                                    </h3>
+                                    <div class="h-[1px] w-12 bg-blue-500/30 mx-auto mt-2"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
-                    <div class="mt-8 flex justify-center">
-                        <button onclick="renderPage('message')" class="text-gray-500 hover:text-gray-300 text-xs uppercase tracking-widest transition-colors flex items-center">
-                            <i class="fas fa-redo-alt mr-2 text-[10px]"></i> Yeniden Oku
+                    <div class="mt-6 flex justify-center">
+                        <button onclick="renderPage('message')" class="text-gray-600 hover:text-gray-400 text-[10px] uppercase tracking-widest transition-colors flex items-center">
+                            <i class="fas fa-redo-alt mr-2 text-[8px]"></i> Yeniden Oku
                         </button>
                     </div>
                 </div>
@@ -419,35 +425,27 @@
             const signatureArea = document.getElementById('signature-area');
             
             const lines = [
-                { text: "Merhaba Çağlar,", style: "text-3xl font-extrabold mb-10 text-white tracking-tight" },
-                { text: "Bugün senin doğum günün... Arkadaşların olarak her anında yanında olacağımızı bilmen adına böyle bir site yapmak istedik, umarız beğenmişsindir.", style: "mb-6 italic text-blue-200" },
-                { text: "Senin gibi dürüst, içten ve değerli birini tanımış olmak bizim için gerçekten büyük ve güzel bir şans. Doğum gününü en içten dileklerimizle kutluyoruz ve her zaman mutluluğunu diliyoruz.", style: "mb-6" },
-                { text: "Doğruları konuşmak gerekirse; kalbinin güzelliği hem yüzüne hem de mizahına vurmuş. Çok eğlenceli, güzel ve sevdiklerine değer veren birisin. Bu yüzden varlığın gerçekten içimizi ısıtıyor.", style: "mb-6 font-medium" },
-                { text: "Ne zaman moralimiz bozuk olsa bizi bir şekilde güldürmeyi başardığın için sana tüm içtenliğimizle teşekkür ederiz. İyi ki arkadaşımızsın.", style: "mb-6" },
-                { text: "Bizler için çok değerli bir arkadaş olduğunu ve her zaman öyle olacağını hiçbir zaman unutma. 💎 İyi ki varsın Çağlar, iyi ki doğmuşsun, iyi ki seninle tanışmışız ve iyi ki bizimlesin. Daha nice yaşlar diliyoruz.", style: "text-blue-100 font-semibold mb-6" }
+                "Merhaba Çağlar,",
+                "Bugün senin doğum günün. Arkadaşların olarak her anında yanında olacağımızı bilmen adına böyle bir site yapmak istedik, umarız beğenmişsindir.",
+                "Senin gibi dürüst, içten ve değerli birini tanımış olmak bizim için gerçekten büyük ve güzel bir şans. Doğum gününü en içten dileklerimizle kutluyoruz ve her zaman mutluluğunu diliyoruz.",
+                "Doğruları konuşmak gerekirse; kalbinin güzelliği hem yüzüne hem de mizahına vurmuş. Çok eğlenceli, güzel ve sevdiklerine değer veren birisin. Bu yüzden varlığın gerçekten içimizi ısıtıyor.",
+                "Ne zaman moralimiz bozuk olsa bizi bir şekilde güldürmeyi başardığın için sana tüm içtenliğimizle teşekkür ederiz. İyi ki arkadaşımızsın.",
+                "Bizler için çok değerli bir arkadaş olduğunu ve her zaman öyle olacağını hiçbir zaman unutma. İyi ki varsın Çağlar, iyi ki doğmuşsun, iyi ki seninle tanışmışız ve iyi ki bizimlesin. Daha nice yaşlar diliyoruz."
             ];
 
             container.innerHTML = "";
-            for (let lineObj of lines) {
+            for (let text of lines) {
                 const p = document.createElement('p');
-                p.className = lineObj.style;
+                p.className = "mb-4";
                 container.appendChild(p);
-                for (let char of lineObj.text) {
+                for (let char of text) {
                     p.innerHTML += char;
-                    await new Promise(r => setTimeout(r, 20));
+                    await new Promise(r => setTimeout(r, 18));
                 }
                 await new Promise(r => setTimeout(r, 200));
             }
 
             signatureArea.classList.remove('hidden');
-            signatureArea.innerHTML = `
-                <div class="flex flex-col items-end text-right">
-                    <span class="text-[10px] text-blue-400 uppercase tracking-[0.6em] mb-4 font-black">Sonsuz Sevgilerimizle</span>
-                    <h3 class="font-cursive text-4xl md:text-6xl signature-gradient py-2">
-                        Tuna, İsmet, Kumsal ve Benna
-                    </h3>
-                </div>
-            `;
             setTimeout(() => signatureArea.style.opacity = '1', 100);
         }
 
@@ -456,19 +454,17 @@
             const btn = document.getElementById('show-message-btn');
             const box = document.getElementById('all-messages-container');
             
-            const openAction = () => {
-                if (wrapper) {
-                    wrapper.style.transform = "scale(0.8)";
+            if (btn) {
+                btn.onclick = () => {
                     wrapper.style.opacity = "0";
+                    wrapper.style.transform = "scale(0.95)";
                     setTimeout(() => {
                         wrapper.classList.add('hidden');
                         box.classList.remove('hidden');
                         typeMessage();
-                    }, 500);
-                }
-            };
-
-            if (btn) btn.onclick = openAction;
+                    }, 400);
+                };
+            }
         }
 
         function createHeartButtons() {
