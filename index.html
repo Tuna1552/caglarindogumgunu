@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İyi ki Doğdun Çağlar</title>
+    <title>İyiki Doğdun Çağlar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -30,6 +30,7 @@
                     animation: {
                         'fade-in': 'fadeIn 1s ease-in-out',
                         'pulse-grow': 'pulseGrow 1.5s ease-in-out infinite',
+                        'light-up': 'lightUp 0.5s ease-out forwards',
                     },
                     keyframes: {
                         fadeIn: {
@@ -39,6 +40,10 @@
                         pulseGrow: {
                             '0%, 100%': { transform: 'scale(1)' },
                             '50%': { transform: 'scale(1.05)' }
+                        },
+                        lightUp: {
+                            '0%': { 'background-color': '#2563eb' },
+                            '100%': { 'background-color': '#93c5fd' }
                         }
                     }
                 }
@@ -50,6 +55,7 @@
             font-family: 'Inter', sans-serif;
             background-color: #0f172a;
             color: #f1f5f9;
+            overflow-y: auto;
         }
         canvas {
             position: fixed;
@@ -62,6 +68,12 @@
             position: relative;
             z-index: 10;
         }
+        .nav-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .nav-button:hover .nav-icon {
+            transform: translateY(-5px);
+        }
         .password-page-transition {
             transition: all 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
@@ -70,41 +82,13 @@
             opacity: 0;
             pointer-events: none;
         }
-        /* Yıldız Buton Stilleri */
-        .star-btn {
-            aspect-ratio: 1 / 1;
-            background-color: #334155;
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #2563eb;
-            transition: all 0.3s;
-            border: 1px solid #475569;
-            cursor: pointer;
-            width: 100%;
-            min-height: 60px;
-        }
-        .star-btn:hover {
-            background-color: #475569;
-        }
         .lighted-star {
-            background-color: #60a5fa !important;
-            color: white !important;
-            box-shadow: 0 0 20px #60a5fa;
-            transform: scale(1.1);
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #2563eb;
-            border-radius: 10px;
+            background-color: #2563eb !important;
+            animation: lightUp 0.5s ease-out forwards;
         }
     </style>
 </head>
-<body class="flex flex-col min-h-screen overflow-x-hidden">
+<body class="flex flex-col min-h-screen">
 
     <canvas id="particles-canvas"></canvas>
 
@@ -116,24 +100,13 @@
                 <p class="text-md text-gray-400 mb-6 font-light">
                     Siteye girmek için mavi yıldızları doğru sırayla takip et (yoğun güvenlikli)
                 </p>
-                
-                <!-- SABİT YILDIZ GRİDİ (JavaScript'ten bağımsız, her zaman görünür) -->
-                <div id="heart-grid" class="grid grid-cols-3 gap-4 max-w-xs mx-auto mb-6">
-                    <button class="star-btn" data-index="0"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="1"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="2"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="3"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="4"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="5"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="6"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="7"><i class="fas fa-star"></i></button>
-                    <button class="star-btn" data-index="8"><i class="fas fa-star"></i></button>
+                <div id="heart-grid" class="grid grid-cols-3 gap-4 max-w-xs mx-auto mb-6 min-h-[150px]">
+                    <!-- Butonlar JS ile eklenecek -->
                 </div>
-
                 <button id="start-button" class="w-full py-3 rounded-2xl font-bold text-white bg-gradient-to-r from-primary-blue to-accent-blue hover:from-accent-blue hover:to-primary-blue transition-all duration-300 transform hover:scale-105 shadow-lg">
                     Şifreyi Göster
                 </button>
-                <p id="feedback-message" class="mt-4 text-red-400 font-medium opacity-0 transition-opacity">
+                <p id="feedback-message" class="mt-4 text-blue-300 font-medium hidden">
                     Yanlış seçim, tekrar dene.
                 </p>
             </div>
@@ -141,232 +114,264 @@
 
         <!-- Main Application Container -->
         <div id="app-container" class="hidden flex-1 flex flex-col p-4 md:p-8 relative">
-            <div id="content-area" class="flex-1 flex flex-col items-center justify-center text-center p-4 overflow-y-auto custom-scrollbar pb-24"></div>
+            <div id="content-area" class="flex-1 flex flex-col items-center justify-center text-center p-4"></div>
 
             <!-- Mobile Navigation -->
-            <nav class="fixed bottom-0 left-0 w-full bg-card-dark bg-opacity-90 backdrop-blur-lg border-t border-gray-700 flex justify-around items-center h-20 shadow-2xl z-20 md:hidden">
-                <button id="nav-home" class="flex-1 flex flex-col items-center justify-center text-xs text-secondary-blue font-semibold">
-                    <i class="fas fa-home text-xl mb-1"></i>
-                    <span>Menü</span>
+            <nav class="fixed bottom-0 left-0 w-full bg-card-dark bg-opacity-90 backdrop-blur-lg border-t border-gray-700 flex justify-around items-center h-16 shadow-2xl z-20 md:hidden">
+                <button id="nav-home" class="nav-button flex-1 flex flex-col items-center justify-center text-xs text-secondary-blue font-semibold p-2">
+                    <i class="fas fa-home text-xl nav-icon"></i>
+                    <span class="mt-1">Menü</span>
                 </button>
-                <button id="nav-memories" class="flex-1 flex flex-col items-center justify-center text-xs text-gray-400 font-semibold">
-                    <i class="fas fa-camera text-xl mb-1"></i>
-                    <span>Anılar</span>
+                <button id="nav-memories" class="nav-button flex-1 flex flex-col items-center justify-center text-xs text-gray-400 font-semibold p-2">
+                    <i class="fas fa-camera text-xl nav-icon"></i>
+                    <span class="mt-1">Anılar</span>
                 </button>
-                <button id="nav-message" class="flex-1 flex flex-col items-center justify-center text-xs text-gray-400 font-semibold">
-                    <i class="fas fa-envelope-open-text text-xl mb-1"></i>
-                    <span>Mesaj</span>
+                <button id="nav-message" class="nav-button flex-1 flex flex-col items-center justify-center text-xs text-gray-400 font-semibold p-2">
+                    <i class="fas fa-envelope-open-text text-xl nav-icon"></i>
+                    <span class="mt-1">Mesaj</span>
                 </button>
             </nav>
 
             <!-- Desktop Navigation -->
-            <nav class="hidden md:flex fixed bottom-6 left-0 right-0 w-full justify-center z-20">
+            <nav class="hidden md:flex fixed bottom-0 left-0 right-0 w-full justify-center p-4">
                 <div class="flex gap-4 p-2 bg-card-dark rounded-full shadow-2xl border border-gray-700 backdrop-blur-lg">
-                    <button id="nav-home-desktop" class="px-8 py-2 rounded-full text-text-light font-bold bg-primary-blue shadow-lg">
+                    <button id="nav-home-desktop" class="nav-button flex items-center px-8 py-2 rounded-full text-text-light font-bold bg-primary-blue shadow-lg">
                         <i class="fas fa-home mr-2"></i> Menü
                     </button>
-                    <button id="nav-memories-desktop" class="px-8 py-2 rounded-full text-text-light font-bold hover:bg-gray-700 transition-colors">
+                    <button id="nav-memories-desktop" class="nav-button flex items-center px-8 py-2 rounded-full text-text-light font-bold hover:bg-gray-700">
                         <i class="fas fa-camera mr-2"></i> Anılar
                     </button>
-                    <button id="nav-message-desktop" class="px-8 py-2 rounded-full text-text-light font-bold hover:bg-gray-700 transition-colors">
-                        <i class="fas fa-envelope-open-text mr-2"></i> Mesajlar
+                    <button id="nav-message-desktop" class="nav-button flex items-center px-8 py-2 rounded-full text-text-light font-bold hover:bg-gray-700">
+                        <i class="fas fa-envelope-open-text mr-2"></i> Mesajım
                     </button>
                 </div>
             </nav>
         </div>
     </div>
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Setup
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let user = null;
-
-        // Auth
-        const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
-            }
-        };
-        initAuth();
-        onAuthStateChanged(auth, (u) => { user = u; });
-
-        // App Logic
+    <script>
         const birthdayDate = new Date('April 26, 2026 00:00:00').getTime();
         let sequence = [];
         let userSequence = [];
+        const heartButtonCount = 9;
         let isPlaying = false;
         
         const passwordPage = document.getElementById('password-page');
         const appContainer = document.getElementById('app-container');
+        const heartGrid = document.getElementById('heart-grid');
         const startButton = document.getElementById('start-button');
         const feedbackMessage = document.getElementById('feedback-message');
         const contentArea = document.getElementById('content-area');
-        const starButtons = document.querySelectorAll('.star-btn');
 
-        // Particle System
         const canvas = document.getElementById('particles-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        const particleColors = ['#2563eb', '#60a5fa', '#38bdf8', '#0ea5e9'];
+
+        const homePageContent = `
+            <div class="flex flex-col md:flex-row items-center justify-center w-full max-w-5xl">
+                <div class="flex-1 text-center md:text-left md:pr-8 mb-8 md:mb-0">
+                    <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-primary-blue animate-fade-in drop-shadow-xl">
+                        İyi ki Doğdun, Çağlar!
+                    </h1>
+                    <p id="countdown-text" class="mt-4 text-xl md:text-3xl lg:text-4xl font-light text-text-light animate-fade-in delay-200">
+                        26 Nisan 2026'ya sadece...
+                    </p>
+                </div>
+                <div class="flex-1 grid grid-cols-2 gap-4 w-full animate-fade-in delay-300">
+                    <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
+                        <span id="days" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span class="text-xs text-gray-400 mt-2">GÜN</span>
+                    </div>
+                    <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
+                        <span id="hours" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span class="text-xs text-gray-400 mt-2">SAAT</span>
+                    </div>
+                    <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
+                        <span id="minutes" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span class="text-xs text-gray-400 mt-2">DAKİKA</span>
+                    </div>
+                    <div class="flex flex-col items-center p-6 bg-card-dark rounded-2xl shadow-lg border border-gray-700">
+                        <span id="seconds" class="text-4xl md:text-6xl font-extrabold text-accent-blue">0</span>
+                        <span class="text-xs text-gray-400 mt-2">SANİYE</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const memoriesPageContent = `
+            <div class="w-full max-w-5xl animate-fade-in">
+                <div class="bg-card-dark rounded-3xl p-6 mb-12 text-center relative overflow-hidden shadow-2xl border border-gray-700">
+                    <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
+                    <h2 class="text-3xl font-bold text-primary-blue mb-4 relative z-10">Anılar</h2>
+                    <p class="text-lg font-light text-gray-300 relative z-10">
+                        Burada zamanla birikecek olan tüm güzel anılarımızı saklayacağız. Şimdilik burası senin için tertemiz bir sayfa...
+                    </p>
+                </div>
+                <div class="flex flex-col items-center justify-center p-12 text-gray-500 italic">
+                    <i class="fas fa-images text-6xl mb-4 opacity-20"></i>
+                    <p>Henüz fotoğraf eklenmedi.</p>
+                </div>
+            </div>
+        `;
+
+        const messagePageContent = `
+            <div class="w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-in text-center pb-24">
+                <div class="relative bg-gradient-to-br from-primary-blue to-accent-blue w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-xl">
+                    <i class="fas fa-star text-4xl text-white"></i>
+                </div>
+                <h1 class="text-4xl font-extrabold text-white mb-4">Sana Özel Bir Not</h1>
+                <div id="message-container-wrapper" class="w-full">
+                    <button id="show-message-btn" class="w-full py-4 rounded-3xl font-bold text-white text-lg bg-primary-blue hover:bg-secondary-blue transition-all shadow-lg animate-pulse">
+                        <i class="fas fa-envelope mr-2"></i> Mesajı Oku
+                    </button>
+                    <div id="all-messages-container" class="hidden bg-card-dark rounded-3xl p-8 text-left shadow-2xl border border-gray-700"></div>
+                </div>
+            </div>
+        `;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
         function createParticle() {
             particles.push({
-                x: Math.random() * canvas.width, y: -10,
-                size: Math.random() * 3 + 1, speed: Math.random() * 2 + 1,
-                color: ['#2563eb', '#60a5fa', '#38bdf8'][Math.floor(Math.random() * 3)],
+                x: Math.random() * canvas.width,
+                y: -10,
+                size: Math.random() * 3 + 1,
+                speed: Math.random() * 2 + 1,
+                color: particleColors[Math.floor(Math.random() * particleColors.length)],
                 opacity: Math.random()
             });
         }
+
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach((p, i) => {
+            particles.forEach((p, index) => {
                 p.y += p.speed;
                 ctx.globalAlpha = p.opacity;
                 ctx.fillStyle = p.color;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-                if (p.y > canvas.height) particles.splice(i, 1);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                if (p.y > canvas.height) particles.splice(index, 1);
             });
-            if (particles.length < 40) createParticle();
+            if (particles.length < 50) createParticle();
             requestAnimationFrame(animate);
         }
 
-        // Navigation
-        function renderPage(page) {
+        function renderPage(pageName) {
+            window.scrollTo(0, 0);
             contentArea.classList.add('opacity-0');
             setTimeout(() => {
-                if (page === 'home') contentArea.innerHTML = `
-                    <div class="w-full max-w-5xl animate-fade-in">
-                        <h1 class="text-5xl md:text-7xl font-extrabold text-primary-blue mb-4">İyi ki Doğdun, Çağlar!</h1>
-                        <p class="text-xl md:text-3xl font-light text-text-light mb-12">26 Nisan 2026'ya sadece...</p>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            ${['Gün', 'Saat', 'Dakika', 'Saniye'].map(label => `
-                                <div class="bg-card-dark p-6 rounded-2xl border border-gray-700 shadow-xl">
-                                    <span id="${label.toLowerCase()}" class="text-4xl md:text-5xl font-black text-accent-blue block">0</span>
-                                    <span class="text-xs text-gray-400 uppercase tracking-widest">${label}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                else if (page === 'memories') contentArea.innerHTML = `
-                    <div class="w-full max-w-4xl animate-fade-in">
-                        <div class="bg-card-dark rounded-3xl p-8 border border-gray-700 mb-8">
-                            <h2 class="text-3xl font-bold text-primary-blue mb-4">Anılar</h2>
-                            <p class="text-gray-400 italic">Şu an burası senin için hazırlık aşamasında. Fotoğraflar yakında burada belirecek!</p>
-                        </div>
-                        <i class="fas fa-images text-8xl opacity-10"></i>
-                    </div>
-                `;
-                else if (page === 'message') {
-                    contentArea.innerHTML = `
-                        <div class="w-full max-w-2xl animate-fade-in">
-                            <h2 class="text-3xl font-bold text-white mb-6">Çağlar'a Mesaj Bırak</h2>
-                            <div class="bg-card-dark p-6 rounded-3xl border border-gray-700 shadow-xl mb-8">
-                                <input id="sender-name" type="text" placeholder="Adınız" class="w-full bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 outline-none">
-                                <textarea id="sender-message" placeholder="Mesajınız..." class="w-full bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 outline-none h-24"></textarea>
-                                <button id="send-message-btn" class="w-full py-3 bg-primary-blue text-white font-bold rounded-xl">Gönder <i class="fas fa-paper-plane ml-2"></i></button>
-                            </div>
-                            <div id="messages-display" class="space-y-4 text-left overflow-y-auto max-h-[400px] pr-2 custom-scrollbar"></div>
-                        </div>
-                    `;
-                    initMessageSystem();
+                if (pageName === 'home') contentArea.innerHTML = homePageContent;
+                else if (pageName === 'memories') contentArea.innerHTML = memoriesPageContent;
+                else if (pageName === 'message') {
+                    contentArea.innerHTML = messagePageContent;
+                    setTimeout(attachMessageButtonListener, 100);
                 }
                 updateCountdown();
+                setActiveNav(pageName);
                 contentArea.classList.remove('opacity-0');
-            }, 200);
+            }, 300);
         }
 
-        // Message System
-        function initMessageSystem() {
-            if (!user) return;
-            const btn = document.getElementById('send-message-btn');
-            const display = document.getElementById('messages-display');
-            const col = collection(db, 'artifacts', appId, 'public', 'data', 'messages');
-
-            onSnapshot(col, (snap) => {
-                const msgs = [];
-                snap.forEach(d => msgs.push(d.data()));
-                msgs.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
-                display.innerHTML = msgs.map(m => `
-                    <div class="bg-slate-800/60 p-4 rounded-2xl border border-gray-700">
-                        <div class="flex justify-between mb-1"><span class="font-bold text-accent-blue">${m.name}</span></div>
-                        <p class="text-gray-300 italic text-sm">"${m.text}"</p>
-                    </div>
-                `).join('') || '<p class="text-center text-gray-500">İlk mesajı sen yaz!</p>';
-            }, (e) => console.error(e));
-
-            btn.onclick = async () => {
-                const name = document.getElementById('sender-name').value.trim();
-                const text = document.getElementById('sender-message').value.trim();
-                if (!name || !text) return;
-                btn.disabled = true;
-                await addDoc(col, { name, text, timestamp: serverTimestamp(), uid: user.uid });
-                document.getElementById('sender-name').value = "";
-                document.getElementById('sender-message').value = "";
-                btn.disabled = false;
-            };
+        function setActiveNav(pageName) {
+            const navIds = ['home', 'memories', 'message'];
+            navIds.forEach(id => {
+                const elMobile = document.getElementById('nav-' + id);
+                const elDesk = document.getElementById('nav-' + id + '-desktop');
+                if (elMobile) elMobile.classList.toggle('text-secondary-blue', id === pageName);
+                if (elDesk) elDesk.classList.toggle('bg-primary-blue', id === pageName);
+            });
         }
 
-        // Countdown
         function updateCountdown() {
-            const distance = birthdayDate - new Date().getTime();
+            const now = new Date().getTime();
+            const distance = birthdayDate - now;
             if (distance > 0) {
-                const d = Math.floor(distance / 86400000);
+                const d = Math.floor(distance / (86400000));
                 const h = Math.floor((distance % 86400000) / 3600000);
                 const m = Math.floor((distance % 3600000) / 60000);
                 const s = Math.floor((distance % 60000) / 1000);
-                if (document.getElementById('gün')) {
-                    document.getElementById('gün').innerText = d;
-                    document.getElementById('saat').innerText = h;
-                    document.getElementById('dakika').innerText = m;
-                    document.getElementById('saniye').innerText = s;
+                ['days', 'hours', 'minutes', 'seconds'].forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = [d, h, m, s][i];
+                });
+            }
+        }
+
+        async function typeMessage() {
+            const container = document.getElementById('all-messages-container');
+            const lines = [
+                "Merhaba Çağlar,",
+                "Bugün senin günün. Yeni yaşında her şeyin o güzel kalbine göre olmasını diliyorum.",
+                "Senin gibi dürüst, içten ve değerli birini tanımış olmak benim için büyük bir şans.",
+                "Bu site, senin için hazırladığım küçük bir sürpriz. Umarım her sayfasında sana ne kadar değer verdiğimizi bir kez daha hissedersin.",
+                "İyi ki doğdun, iyi ki varsın!",
+                "- Arkadaşın"
+            ];
+            container.innerHTML = "";
+            for (let line of lines) {
+                const p = document.createElement('p');
+                p.className = 'mb-4 text-lg leading-relaxed';
+                container.appendChild(p);
+                for (let char of line) {
+                    p.innerHTML += char;
+                    await new Promise(r => setTimeout(r, 40));
                 }
             }
         }
 
-        // Yıldız Şifre Mantığı
-        starButtons.forEach((btn, i) => {
-            btn.onclick = () => {
-                if (isPlaying) return;
-                userSequence.push(i);
-                btn.classList.add('lighted-star');
-                setTimeout(() => btn.classList.remove('lighted-star'), 400);
-                
-                if (userSequence.length === sequence.length) {
-                    if (userSequence.every((v, j) => v === sequence[j])) {
-                        passwordPage.classList.add('password-page-hidden');
-                        setTimeout(() => {
-                            passwordPage.classList.add('hidden');
-                            appContainer.classList.remove('hidden');
-                            renderPage('home');
-                        }, 500);
-                    } else {
-                        feedbackMessage.style.opacity = 1;
-                        userSequence = [];
-                        setTimeout(() => feedbackMessage.style.opacity = 0, 2000);
-                    }
-                }
+        function attachMessageButtonListener() {
+            const btn = document.getElementById('show-message-btn');
+            const box = document.getElementById('all-messages-container');
+            if (btn) btn.onclick = () => {
+                btn.classList.add('hidden');
+                box.classList.remove('hidden');
+                typeMessage();
             };
-        });
+        }
+
+        function createHeartButtons() {
+            heartGrid.innerHTML = '';
+            for (let i = 0; i < heartButtonCount; i++) {
+                const b = document.createElement('button');
+                b.className = 'star-btn aspect-square bg-gray-700 rounded-full flex items-center justify-center text-2xl text-primary-blue hover:bg-gray-600 transition-all';
+                b.innerHTML = '<i class="fas fa-star"></i>';
+                b.onclick = () => {
+                    if (isPlaying) return;
+                    userSequence.push(i);
+                    b.classList.add('lighted-star');
+                    setTimeout(() => b.classList.remove('lighted-star'), 400);
+                    if (userSequence.length === sequence.length) {
+                        if (userSequence.every((v, j) => v === sequence[j])) {
+                            passwordPage.classList.add('password-page-hidden');
+                            setTimeout(() => {
+                                passwordPage.classList.add('hidden');
+                                appContainer.classList.remove('hidden');
+                                renderPage('home');
+                            }, 500);
+                        } else {
+                            feedbackMessage.classList.remove('hidden');
+                            userSequence = [];
+                            setTimeout(() => feedbackMessage.classList.add('hidden'), 2000);
+                        }
+                    }
+                };
+                heartGrid.appendChild(b);
+            }
+        }
 
         startButton.onclick = () => {
-            if (isPlaying) return;
             sequence = Array.from({length: 4}, () => Math.floor(Math.random() * 9));
-            userSequence = [];
             isPlaying = true;
             let step = 0;
+            const btns = document.querySelectorAll('.star-btn');
             const interval = setInterval(() => {
                 if (step < sequence.length) {
-                    const b = starButtons[sequence[step]];
+                    const b = btns[sequence[step]];
                     b.classList.add('lighted-star');
                     setTimeout(() => b.classList.remove('lighted-star'), 500);
                     step++;
@@ -377,15 +382,18 @@
             }, 800);
         };
 
-        // Init
-        window.onload = () => { resizeCanvas(); animate(); setInterval(updateCountdown, 1000); };
+        ['home', 'memories', 'message'].forEach(p => {
+            document.getElementById('nav-' + p).onclick = () => renderPage(p);
+            document.getElementById('nav-' + p + '-desktop').onclick = () => renderPage(p);
+        });
+
+        window.onload = () => {
+            resizeCanvas();
+            animate();
+            createHeartButtons();
+            setInterval(updateCountdown, 1000);
+        };
         window.onresize = resizeCanvas;
-        document.getElementById('nav-home').onclick = () => renderPage('home');
-        document.getElementById('nav-memories').onclick = () => renderPage('memories');
-        document.getElementById('nav-message').onclick = () => renderPage('message');
-        document.getElementById('nav-home-desktop').onclick = () => renderPage('home');
-        document.getElementById('nav-memories-desktop').onclick = () => renderPage('memories');
-        document.getElementById('nav-message-desktop').onclick = () => renderPage('message');
     </script>
 </body>
 </html>
