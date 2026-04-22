@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İyiki Doğdun Çağlar</title>
+    <title>İyi ki Doğdun Çağlar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
@@ -86,6 +86,16 @@
             background-color: #2563eb !important;
             animation: lightUp 0.5s ease-out forwards;
         }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.1);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #2563eb;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -114,7 +124,7 @@
 
         <!-- Main Application Container -->
         <div id="app-container" class="hidden flex-1 flex flex-col p-4 md:p-8 relative">
-            <div id="content-area" class="flex-1 flex flex-col items-center justify-center text-center p-4"></div>
+            <div id="content-area" class="flex-1 flex flex-col items-center justify-center text-center p-4 overflow-y-auto custom-scrollbar pb-20"></div>
 
             <!-- Mobile Navigation -->
             <nav class="fixed bottom-0 left-0 w-full bg-card-dark bg-opacity-90 backdrop-blur-lg border-t border-gray-700 flex justify-around items-center h-16 shadow-2xl z-20 md:hidden">
@@ -142,14 +152,38 @@
                         <i class="fas fa-camera mr-2"></i> Anılar
                     </button>
                     <button id="nav-message-desktop" class="nav-button flex items-center px-8 py-2 rounded-full text-text-light font-bold hover:bg-gray-700">
-                        <i class="fas fa-envelope-open-text mr-2"></i> Mesajım
+                        <i class="fas fa-envelope-open-text mr-2"></i> Mesajlar
                     </button>
                 </div>
             </nav>
         </div>
     </div>
     
-    <script>
+    <script type="module">
+        // Firebase Modülleri
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Değişkenler ve Firebase Hazırlığı
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let user = null;
+
+        // Kimlik Doğrulama (RULE 3)
+        const initAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
+        };
+        initAuth();
+        onAuthStateChanged(auth, (u) => { user = u; });
+
         const birthdayDate = new Date('April 26, 2026 00:00:00').getTime();
         let sequence = [];
         let userSequence = [];
@@ -216,16 +250,21 @@
         `;
 
         const messagePageContent = `
-            <div class="w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-in text-center pb-24">
-                <div class="relative bg-gradient-to-br from-primary-blue to-accent-blue w-24 h-24 rounded-full flex items-center justify-center mb-6 shadow-xl">
-                    <i class="fas fa-star text-4xl text-white"></i>
-                </div>
-                <h1 class="text-4xl font-extrabold text-white mb-4">Sana Özel Bir Not</h1>
-                <div id="message-container-wrapper" class="w-full">
-                    <button id="show-message-btn" class="w-full py-4 rounded-3xl font-bold text-white text-lg bg-primary-blue hover:bg-secondary-blue transition-all shadow-lg animate-pulse">
-                        <i class="fas fa-envelope mr-2"></i> Mesajı Oku
+            <div class="w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-in text-center">
+                <h1 class="text-3xl font-extrabold text-white mb-6">Çağlar'a Mesaj Bırak</h1>
+                
+                <!-- Mesaj Gönderme Formu -->
+                <div class="w-full bg-card-dark p-6 rounded-3xl border border-gray-700 shadow-xl mb-8">
+                    <input id="sender-name" type="text" placeholder="Adınız" class="w-full bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-primary-blue">
+                    <textarea id="sender-message" placeholder="Mesajınız..." class="w-full bg-slate-800 text-white rounded-xl px-4 py-3 mb-4 outline-none focus:ring-2 focus:ring-primary-blue h-24"></textarea>
+                    <button id="send-message-btn" class="w-full py-3 bg-primary-blue text-white font-bold rounded-xl hover:bg-accent-blue transition-all">
+                        Gönder <i class="fas fa-paper-plane ml-2"></i>
                     </button>
-                    <div id="all-messages-container" class="hidden bg-card-dark rounded-3xl p-8 text-left shadow-2xl border border-gray-700"></div>
+                </div>
+
+                <!-- Mesaj Listesi -->
+                <div id="messages-display" class="w-full space-y-4 text-left max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="text-gray-500 italic py-10 text-center">Mesajlar yükleniyor...</div>
                 </div>
             </div>
         `;
@@ -269,7 +308,7 @@
                 else if (pageName === 'memories') contentArea.innerHTML = memoriesPageContent;
                 else if (pageName === 'message') {
                     contentArea.innerHTML = messagePageContent;
-                    setTimeout(attachMessageButtonListener, 100);
+                    initMessageSystem();
                 }
                 updateCountdown();
                 setActiveNav(pageName);
@@ -283,7 +322,10 @@
                 const elMobile = document.getElementById('nav-' + id);
                 const elDesk = document.getElementById('nav-' + id + '-desktop');
                 if (elMobile) elMobile.classList.toggle('text-secondary-blue', id === pageName);
-                if (elDesk) elDesk.classList.toggle('bg-primary-blue', id === pageName);
+                if (elDesk) {
+                    elDesk.classList.toggle('bg-primary-blue', id === pageName);
+                    elDesk.classList.toggle('hover:bg-gray-700', id !== pageName);
+                }
             });
         }
 
@@ -302,35 +344,70 @@
             }
         }
 
-        async function typeMessage() {
-            const container = document.getElementById('all-messages-container');
-            const lines = [
-                "Merhaba Çağlar,",
-                "Bugün senin günün. Yeni yaşında her şeyin o güzel kalbine göre olmasını diliyorum.",
-                "Senin gibi dürüst, içten ve değerli birini tanımış olmak benim için büyük bir şans.",
-                "Bu site, senin için hazırladığım küçük bir sürpriz. Umarım her sayfasında sana ne kadar değer verdiğimizi bir kez daha hissedersin.",
-                "İyi ki doğdun, iyi ki varsın!",
-                "- Arkadaşın"
-            ];
-            container.innerHTML = "";
-            for (let line of lines) {
-                const p = document.createElement('p');
-                p.className = 'mb-4 text-lg leading-relaxed';
-                container.appendChild(p);
-                for (let char of line) {
-                    p.innerHTML += char;
-                    await new Promise(r => setTimeout(r, 40));
-                }
-            }
-        }
+        // İnteraktif Mesaj Sistemi Mantığı
+        function initMessageSystem() {
+            const sendBtn = document.getElementById('send-message-btn');
+            const nameInput = document.getElementById('sender-name');
+            const msgInput = document.getElementById('sender-message');
+            const display = document.getElementById('messages-display');
 
-        function attachMessageButtonListener() {
-            const btn = document.getElementById('show-message-btn');
-            const box = document.getElementById('all-messages-container');
-            if (btn) btn.onclick = () => {
-                btn.classList.add('hidden');
-                box.classList.remove('hidden');
-                typeMessage();
+            if (!user) return;
+
+            // RULE 1 Path
+            const msgCol = collection(db, 'artifacts', appId, 'public', 'data', 'birthday_messages');
+
+            // Mesajları Dinle (Real-time)
+            onSnapshot(msgCol, (snapshot) => {
+                const messages = [];
+                snapshot.forEach(doc => messages.push(doc.data()));
+                
+                // RULE 2: Bellekte sıralama
+                messages.sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0));
+
+                if (messages.length === 0) {
+                    display.innerHTML = '<div class="text-gray-500 italic py-10 text-center">Henüz mesaj yok. İlk yazan sen ol!</div>';
+                } else {
+                    display.innerHTML = messages.map(m => `
+                        <div class="bg-slate-800/50 p-5 rounded-2xl border border-gray-700 animate-fade-in">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-bold text-accent-blue">${m.name}</span>
+                                <span class="text-[10px] text-gray-500">${m.timestamp ? new Date(m.timestamp.seconds * 1000).toLocaleDateString('tr-TR') : 'Az önce'}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm italic">"${m.message}"</p>
+                        </div>
+                    `).join('');
+                }
+            }, (error) => {
+                console.error("Firestore error:", error);
+            });
+
+            // Mesaj Gönder
+            sendBtn.onclick = async () => {
+                const name = nameInput.value.trim();
+                const text = msgInput.value.trim();
+
+                if (!name || !text) {
+                    return;
+                }
+
+                sendBtn.disabled = true;
+                sendBtn.innerText = "Gönderiliyor...";
+
+                try {
+                    await addDoc(msgCol, {
+                        name: name,
+                        message: text,
+                        timestamp: serverTimestamp(),
+                        uid: user.uid
+                    });
+                    nameInput.value = "";
+                    msgInput.value = "";
+                } catch (e) {
+                    console.error("Gönderim hatası:", e);
+                } finally {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = 'Gönder <i class="fas fa-paper-plane ml-2"></i>';
+                }
             };
         }
 
@@ -382,6 +459,7 @@
             }, 800);
         };
 
+        // Navigation Bindings
         ['home', 'memories', 'message'].forEach(p => {
             document.getElementById('nav-' + p).onclick = () => renderPage(p);
             document.getElementById('nav-' + p + '-desktop').onclick = () => renderPage(p);
