@@ -32,8 +32,6 @@
                         'pulse-grow': 'pulseGrow 1.5s ease-in-out infinite',
                         'light-up': 'lightUp 0.5s ease-out forwards',
                         'float': 'float 3s ease-in-out infinite',
-                        'shine': 'shine 2s infinite',
-                        'bounce-slow': 'bounce 3s infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -51,10 +49,6 @@
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-10px)' }
-                        },
-                        shine: {
-                            '0%': { transform: 'translateX(-100%)' },
-                            '100%': { transform: 'translateX(100%)' }
                         }
                     }
                 }
@@ -97,7 +91,6 @@
             background-color: #2563eb !important;
             animation: lightUp 0.5s ease-out forwards;
         }
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -111,43 +104,52 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #2563eb;
         }
-        .memory-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            break-inside: avoid;
-            margin-bottom: 1.5rem;
-        }
-        .memory-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
-        }
-        /* Masonry Grid for Photos */
-        .masonry-grid {
-            column-count: 2;
-            column-gap: 1.5rem;
-        }
-        @media (min-width: 768px) {
-            .masonry-grid {
-                column-count: 3;
-            }
-        }
-        @media (min-width: 1024px) {
-            .masonry-grid {
-                column-count: 4;
-            }
-        }
-        /* Glass Panel Styling */
+        
         .glass-panel {
             background: rgba(30, 41, 59, 0.6);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
         .signature-gradient {
             background: linear-gradient(to right, #60a5fa, #f1f5f9, #38bdf8);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             display: inline-block;
+        }
+
+        /* Fixed Grid Layout */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        @media (min-width: 768px) {
+            .photo-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .photo-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        .photo-card {
+            aspect-ratio: 4/5;
+            overflow: hidden;
+            border-radius: 1rem;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .photo-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .photo-card:hover img {
+            transform: scale(1.1);
         }
     </style>
 </head>
@@ -262,24 +264,19 @@
             </div>
         `;
 
-        // Fotoğraf URLs - Yeni sıralama: En alttakiler (yeni eklenenler) en üste alındı
-        const photoUrls = [
-            // KURAL 1: DAİMA EN ÜSTTE VE BAŞTA OLAN SABİTLER
-            "https://i.ibb.co/X9Zmx2s/ciktfoto.jpg", // Anı 6
-            "https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg",  // Anı 7
-            
-            // KURAL 2: YENİ ATILAN FOTOĞRAFLAR (Üste alındı)
+        // Featured Image
+        const featuredPhoto = "https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg";
+
+        // Other photos
+        const otherPhotos = [
+            "https://i.ibb.co/X9Zmx2s/ciktfoto.jpg",
             "https://i.ibb.co/C3FT8SQ0/caglar-ismet-izban.jpg",
             "https://i.ibb.co/ksMjVtwz/vesikal-k-a-lar.jpg",
             "https://i.ibb.co/YBfmYk52/caglar-kald-r-rken.jpg",
             "https://i.ibb.co/4Db4FtN/caglar-kumsali-doverkene.jpg",
-            
-            // KURAL 3: DAHA ÖNCE ÜSTE ALINMIŞ ÖZEL ANILAR
-            "https://i.ibb.co/TMY0m51h/6.jpg", // Anı #8
-            "https://i.ibb.co/pmZR3Mn/7.jpg", // Anı #9
-            "https://i.ibb.co/NhYQgtB/3.jpg", // Anı #4
-            
-            // KURAL 4: DİĞER ESKİ ANILAR (Aşağıya kaydırıldı)
+            "https://i.ibb.co/TMY0m51h/6.jpg",
+            "https://i.ibb.co/pmZR3Mn/7.jpg",
+            "https://i.ibb.co/NhYQgtB/3.jpg",
             "https://i.ibb.co/mrPWCdKv/1.jpg",
             "https://i.ibb.co/V0ZMqyF7/2.jpg",
             "https://i.ibb.co/YTVSmV8H/4.jpg",
@@ -287,32 +284,45 @@
             "https://i.ibb.co/4ZtdH38H/144p-caglar-benna.jpg",
             "https://i.ibb.co/9H2V4KHb/ismetcaglar2.png",
             "https://i.ibb.co/jP10t1Rk/caglarismet3.png",
-            
-            // KURAL 5: EN ALTA/AŞAĞIYA KOYULAN ÖZEL LİNK
             "https://i.ibb.co/XfHZ6RjF/Whats-App-mage-2026-04-08-at-15-10-00.jpg"
         ];
 
-        const memoriesPageContent = `
-            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32 px-4">
-                <div class="bg-card-dark rounded-3xl p-6 mb-12 text-center relative overflow-hidden shadow-2xl border border-gray-700">
-                    <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-primary-blue mb-1 relative z-10">Güzel Anılarımız</h2>
-                    <p class="text-xs md:text-lg font-light text-gray-400 relative z-10">
-                        Birlikte geçirdiğimiz her saniye çok değerli...
-                    </p>
+        function generateMemoriesHTML() {
+            const featuredSection = `
+                <div class="w-full mb-10 group">
+                    <div class="relative overflow-hidden rounded-[2.5rem] shadow-2xl border-2 border-primary-blue/20 bg-card-dark">
+                        <img src="${featuredPhoto}" alt="Öne Çıkan Anı" class="w-full max-h-[600px] object-cover block transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-60"></div>
+                        <div class="absolute bottom-6 left-6 text-left">
+                            <span class="bg-primary-blue text-white text-[10px] px-3 py-1 rounded-full font-bold tracking-widest uppercase">Öne Çıkan Fotoğraf</span>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="masonry-grid">
-                    ${photoUrls.map((url, i) => `
-                        <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
-                            <div class="relative overflow-hidden">
-                                <img src="${url}" alt="Anı" class="w-full h-auto object-contain" loading="lazy">
-                                <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                    <p class="text-white font-bold text-sm">Görsel</p>
-                                </div>
-                            </div>
+            `;
+
+            const gridSection = `
+                <div class="photo-grid">
+                    ${otherPhotos.map(url => `
+                        <div class="photo-card group shadow-lg">
+                            <img src="${url}" alt="Anı" loading="lazy">
                         </div>
                     `).join('')}
+                </div>
+            `;
+
+            return featuredSection + gridSection;
+        }
+
+        const memoriesPageContent = `
+            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32 px-4">
+                <div class="bg-card-dark rounded-3xl p-6 mb-8 text-center relative overflow-hidden shadow-2xl border border-gray-700">
+                    <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
+                    <h2 class="text-2xl md:text-3xl font-bold text-primary-blue mb-1 relative z-10">Güzel Anılarımız</h2>
+                    <p class="text-sm font-light text-gray-400 relative z-10">Birlikte çok güzeliz...</p>
+                </div>
+                
+                <div class="flex flex-col">
+                    ${generateMemoriesHTML()}
                 </div>
             </div>
         `;
