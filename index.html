@@ -118,37 +118,45 @@
             display: inline-block;
         }
 
-        /* Photo Grid Layout - Updated to 3 columns */
+        /* Responsive Photo Grid Layout */
         .photo-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
+            /* Mobile: 2 columns to ensure photos are visible and large enough */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
         }
+        
         @media (min-width: 768px) {
+            /* Desktop: Back to 3 columns as requested earlier */
             .photo-grid {
                 grid-template-columns: repeat(3, 1fr);
                 gap: 1.5rem;
             }
         }
+        
         .photo-card {
-            aspect-ratio: 1/1; /* Square ratio looks better for 3-column grid */
+            aspect-ratio: 1/1; 
             overflow: hidden;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
             background: #1e293b;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
+        
         @media (min-width: 768px) {
             .photo-card {
-                border-radius: 1rem;
+                border-radius: 1.25rem;
                 aspect-ratio: 4/5;
             }
         }
+        
         .photo-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
         }
+        
         .photo-card:hover img {
             transform: scale(1.1);
         }
@@ -271,12 +279,12 @@
         // Other photos
         const otherPhotos = [
             "https://i.ibb.co/X9Zmx2s/ciktfoto.jpg",
-            "https://i.ibb.co/4ZtdH38H/144p-caglar-benna.jpg",
             "https://i.ibb.co/YBfmYk52/caglar-kald-r-rken.jpg",
+            "https://i.ibb.co/4ZtdH38H/144p-caglar-benna.jpg",
             "https://i.ibb.co/4Db4FtN/caglar-kumsali-doverkene.jpg",
+            "https://i.ibb.co/pmZR3Mn/7.jpg",
             "https://i.ibb.co/C3FT8SQ0/caglar-ismet-izban.jpg",
             "https://i.ibb.co/TMY0m51h/6.jpg",
-            "https://i.ibb.co/pmZR3Mn/7.jpg",
             "https://i.ibb.co/NhYQgtB/3.jpg",
             "https://i.ibb.co/mrPWCdKv/1.jpg",
             "https://i.ibb.co/V0ZMqyF7/2.jpg",
@@ -290,12 +298,12 @@
 
         function generateMemoriesHTML() {
             const featuredSection = `
-                <div class="w-full mb-6 md:mb-10 group">
+                <div class="w-full mb-8 md:mb-12 group px-1">
                     <div class="relative overflow-hidden rounded-2xl md:rounded-[2.5rem] shadow-2xl border-2 border-primary-blue/20 bg-card-dark">
-                        <img src="${featuredPhoto}" alt="Öne Çıkan Anı" class="w-full max-h-[500px] md:max-h-[600px] object-cover block transition-transform duration-700 group-hover:scale-105">
-                        <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-60"></div>
-                        <div class="absolute bottom-4 left-4 md:bottom-6 md:left-6 text-left">
-                            <span class="bg-primary-blue text-white text-[8px] md:text-[10px] px-2 md:px-3 py-1 rounded-full font-bold tracking-widest uppercase">Öne Çıkan Fotoğraf</span>
+                        <img src="${featuredPhoto}" alt="Öne Çıkan Anı" class="w-full max-h-[450px] md:max-h-[600px] object-cover block transition-transform duration-700 group-hover:scale-105">
+                        <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/90 via-transparent to-transparent opacity-70"></div>
+                        <div class="absolute bottom-4 left-4 md:bottom-8 md:left-8 text-left">
+                            <span class="bg-primary-blue text-white text-[10px] md:text-[12px] px-3 py-1 rounded-full font-bold tracking-widest uppercase shadow-lg">Öne Çıkan Fotoğraf</span>
                         </div>
                     </div>
                 </div>
@@ -315,11 +323,11 @@
         }
 
         const memoriesPageContent = `
-            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32 px-2 md:px-4">
-                <div class="bg-card-dark rounded-2xl md:rounded-3xl p-4 md:p-6 mb-6 md:mb-8 text-center relative overflow-hidden shadow-2xl border border-gray-700">
+            <div class="w-full max-w-6xl animate-fade-in pb-24 md:pb-32 px-3 md:px-4">
+                <div class="bg-card-dark rounded-2xl md:rounded-3xl p-5 md:p-8 mb-6 md:mb-10 text-center relative overflow-hidden shadow-2xl border border-gray-700">
                     <div class="absolute inset-0 bg-primary-blue opacity-10 blur-xl animate-pulse"></div>
-                    <h2 class="text-xl md:text-3xl font-bold text-primary-blue mb-1 relative z-10">Güzel Anılarımız</h2>
-                    <p class="text-xs md:text-sm font-light text-gray-400 relative z-10">Birlikte çok güzeliz...</p>
+                    <h2 class="text-2xl md:text-4xl font-bold text-primary-blue mb-2 relative z-10">Güzel Anılarımız</h2>
+                    <p class="text-sm md:text-base font-light text-gray-400 relative z-10 italic">Birlikte çok güzeliz...</p>
                 </div>
                 
                 <div class="flex flex-col">
