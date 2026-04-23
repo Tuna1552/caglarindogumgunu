@@ -158,9 +158,9 @@
     <div class="ui-container flex flex-col min-h-screen">
         <!-- Password Page -->
         <div id="password-page" class="flex flex-col items-center justify-center flex-1 p-4 text-center password-page-transition">
-            <div class="w-full max-w-sm p-8 bg-card-dark rounded-3xl shadow-2xl backdrop-blur-md border border-gray-700">
+            <div class="w-full max-sm:px-4 max-w-sm p-8 bg-card-dark rounded-3xl shadow-2xl backdrop-blur-md border border-gray-700">
                 <h1 class="text-4xl md:text-5xl font-extrabold mb-4 text-secondary-blue drop-shadow-lg animate-pulse-grow">Merhaba, Çağlar!</h1>
-                <p class="text-md text-gray-400 mb-6 font-light">
+                <p class="text-sm text-gray-400 mb-6 font-light">
                     Siteye girmek için mavi yıldızları doğru sırayla takip et (yoğun güvenlikli)
                 </p>
                 <div id="heart-grid" class="grid grid-cols-3 gap-4 max-w-xs mx-auto mb-6 min-h-[150px]">
@@ -262,19 +262,34 @@
             </div>
         `;
 
+        // Fotoğraf URLs - Yeni sıralama: En alttakiler (yeni eklenenler) en üste alındı
         const photoUrls = [
-            "https://i.ibb.co/ksMjVtwz/vesikal-k-a-lar.jpg",
-            "https://i.ibb.co/9H2V4KHb/ismetcaglar2.png",
-            "https://i.ibb.co/jP10t1Rk/caglarismet3.png",
+            // KURAL 1: DAİMA EN ÜSTTE VE BAŞTA OLAN SABİTLER
+            "https://i.ibb.co/X9Zmx2s/ciktfoto.jpg", // Anı 6
+            "https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg",  // Anı 7
+            
+            // KURAL 2: YENİ ATILAN FOTOĞRAFLAR (Üste alındı)
+            "https://i.ibb.co/C3FT8SQ0/caglar-ismet-izban.jpg",
+            "https://i.ibb.co/4ZtdH38H/144p-caglar-benna.jpg",
+            "https://i.ibb.co/YBfmYk52/caglar-kald-r-rken.jpg",
+            "https://i.ibb.co/4Db4FtN/caglar-kumsali-doverkene.jpg",
+            
+            // KURAL 3: DAHA ÖNCE ÜSTE ALINMIŞ ÖZEL ANILAR
+            "https://i.ibb.co/TMY0m51h/6.jpg", // Anı #8
+            "https://i.ibb.co/pmZR3Mn/7.jpg", // Anı #9
+            "https://i.ibb.co/YTVSmV8H/4.jpg", // Anı #4
+            
+            // KURAL 4: DİĞER ESKİ ANILAR (Aşağıya kaydırıldı)
             "https://i.ibb.co/mrPWCdKv/1.jpg",
             "https://i.ibb.co/V0ZMqyF7/2.jpg",
             "https://i.ibb.co/NhYQgtB/3.jpg",
-            "https://i.ibb.co/YTVSmV8H/4.jpg",
             "https://i.ibb.co/39n1yB0J/5.jpg",
-            "https://i.ibb.co/TMY0m51h/6.jpg",
-            "https://i.ibb.co/pmZR3Mn/7.jpg",
-            "https://i.ibb.co/HpHrtjtK/cc2a738f-c1c1-4273-9384-7557cbaa4f86-1.jpg",
-            "https://i.ibb.co/X9Zmx2s/ciktfoto.jpg"
+            "https://i.ibb.co/ksMjVtwz/vesikal-k-a-lar.jpg",
+            "https://i.ibb.co/9H2V4KHb/ismetcaglar2.png",
+            "https://i.ibb.co/jP10t1Rk/caglarismet3.png",
+            
+            // KURAL 5: EN ALTA/AŞAĞIYA KOYULAN ÖZEL LİNK
+            "https://i.ibb.co/XfHZ6RjF/Whats-App-mage-2026-04-08-at-15-10-00.jpg"
         ];
 
         const memoriesPageContent = `
@@ -291,9 +306,9 @@
                     ${photoUrls.map((url, i) => `
                         <div class="memory-card bg-card-dark rounded-2xl overflow-hidden border border-white/5 shadow-xl group">
                             <div class="relative overflow-hidden">
-                                <img src="${url}" alt="Anı ${i+1}" class="w-full h-auto object-contain">
+                                <img src="${url}" alt="Anı" class="w-full h-auto object-contain" loading="lazy">
                                 <div class="absolute inset-0 bg-gradient-to-t from-bg-dark/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-                                    <p class="text-white font-bold text-sm">Anı #${i+1}</p>
+                                    <p class="text-white font-bold text-sm">Görsel</p>
                                 </div>
                             </div>
                         </div>
@@ -304,26 +319,20 @@
 
         const messagePageContent = `
             <div class="w-full max-w-2xl mx-auto flex flex-col items-center animate-fade-in text-center pb-24 pt-6 px-4 min-h-[60vh] justify-center">
-                <!-- Message Box Container -->
                 <div id="envelope-wrapper" class="flex flex-col items-center">
                     <div class="mb-8 animate-float">
                         <i class="fas fa-envelope-open-text text-6xl text-primary-blue drop-shadow-[0_0_10px_rgba(37,99,235,0.4)]"></i>
                     </div>
-                    
                     <p class="text-blue-300 uppercase tracking-[0.3em] text-[10px] font-bold mb-6 opacity-70">Senin İçin Bir Not Bırakıldı</p>
-                    
                     <button id="show-message-btn" class="group relative px-10 py-4 bg-primary-blue hover:bg-blue-600 rounded-full font-black text-white text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-xl shadow-blue-900/20 overflow-hidden">
                         <span class="relative z-10">MESAJI OKU</span>
                         <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                     </button>
                 </div>
-                
-                <!-- Expanded Letter Content -->
                 <div id="all-messages-container" class="hidden w-full max-w-2xl text-left">
                     <div class="glass-panel rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden">
                         <div class="relative z-10">
                             <div id="typed-text-content" class="text-gray-200 leading-relaxed text-sm md:text-base font-light tracking-wide space-y-4"></div>
-                            
                             <div id="signature-area" class="hidden mt-12 pt-10 border-t border-white/5 opacity-0 transition-opacity duration-1000 text-center">
                                 <p class="text-[9px] text-blue-400 uppercase tracking-[0.4em] mb-4 font-bold opacity-60">Sonsuz Sevgilerimizle</p>
                                 <div class="inline-block relative">
@@ -335,7 +344,6 @@
                             </div>
                         </div>
                     </div>
-                    
                     <div class="mt-6 flex justify-center">
                         <button onclick="renderPage('message')" class="text-gray-600 hover:text-gray-400 text-[10px] uppercase tracking-widest transition-colors flex items-center">
                             <i class="fas fa-redo-alt mr-2 text-[8px]"></i> Yeniden Oku
@@ -450,7 +458,6 @@
             const wrapper = document.getElementById('envelope-wrapper');
             const btn = document.getElementById('show-message-btn');
             const box = document.getElementById('all-messages-container');
-            
             if (btn) {
                 btn.onclick = () => {
                     wrapper.style.opacity = "0";
