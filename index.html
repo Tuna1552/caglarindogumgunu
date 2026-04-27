@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Yükleniyor</title>
+    <title>Benna | Özel Erişim</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Space+Grotesk:wght@300;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;700&family=Playfair+Display:ital,wght@1,500;1,700&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                        mono: ['Space Grotesk', 'monospace'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        fun: ['Nunito', 'sans-serif'],
                     },
                     animation: {
-                        'blob': 'blob 7s infinite',
-                        'float': 'float 3s ease-in-out infinite',
-                        'scan': 'scan 3s linear infinite',
+                        'float': 'float 8s ease-in-out infinite',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                        'pulse-soft': 'pulseSoft 4s ease-in-out infinite',
                     },
                     keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-10px)' }
+                            '50%': { transform: 'translateY(-15px)' }
                         },
-                        scan: {
-                            '0%': { top: '0%' },
-                            '100%': { top: '100%' }
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        pulseSoft: {
+                            '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(0.98)' }
                         }
                     }
                 }
@@ -43,98 +43,298 @@
     </script>
     <style>
         body {
-            background-color: #020617;
-            color: #f8fafc;
+            background-color: #f8f9fa;
+            color: #2d3436;
             overflow: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-        .glass {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+
+        .gradient-blur {
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 15% 15%, rgba(255, 192, 203, 0.2) 0%, transparent 35%),
+                radial-gradient(circle at 85% 85%, rgba(165, 180, 252, 0.2) 0%, transparent 35%);
+            z-index: -1;
         }
-        .scanner-line {
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #fb7185, transparent);
-            position: absolute;
-            width: 100%;
-            z-index: 20;
-            opacity: 0.5;
+
+        /* Karakterler */
+        .char-body {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .char-purple { background: #6c5ce7; }
+        .char-orange { background: #ff7043; border-radius: 50% 50% 0 0; }
+        .char-dark { background: #1a1a2e; }
+
+        .eye { width: 10px; height: 10px; background: white; border-radius: 50%; position: relative; overflow: hidden; }
+        .pupil { width: 5px; height: 5px; background: black; border-radius: 50%; position: absolute; left: 25%; top: 25%; transition: transform 0.1s ease-out; }
+        .mouth { width: 12px; height: 6px; border-bottom: 2px solid rgba(0,0,0,0.3); border-radius: 50%; margin-top: 4px; transition: all 0.3s ease; }
+        .mouth.sad { border-bottom: none; border-top: 2px solid rgba(255,255,255,0.4); margin-top: 10px; }
+        .mouth.happy { width: 16px; height: 10px; border-bottom: 4px solid rgba(0,0,0,0.4); border-radius: 0 0 10px 10px; }
+
+        .password-input-wrapper {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 8px 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+        }
+
+        .password-input-wrapper:focus-within {
+            border-color: #6c5ce7;
+            box-shadow: 0 10px 40px rgba(108, 92, 231, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Ana Sayfa Geri Sayım Tasarımı */
+        .countdown-container {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s ease;
+        }
+
+        .countdown-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid white;
+            border-radius: 32px;
+            padding: 2rem;
+            min-width: 120px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+            text-align: center;
+        }
+
+        .active-screen {
+            display: flex !important;
+            opacity: 1;
+            transform: translateY(0);
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen font-sans p-6">
+<body class="min-h-screen flex items-center justify-center font-sans px-6">
 
-    <!-- Dinamik Arka Plan Blobları -->
-    <div class="fixed top-0 -left-4 w-96 h-96 bg-blue-600 rounded-full mix-blend-screen filter blur-[100px] opacity-10 animate-blob"></div>
-    <div class="fixed top-0 -right-4 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[100px] opacity-10 animate-blob animation-delay-2000"></div>
-    <div class="fixed -bottom-8 left-20 w-96 h-96 bg-rose-600 rounded-full mix-blend-screen filter blur-[100px] opacity-10 animate-blob animation-delay-4000"></div>
+    <div class="gradient-blur"></div>
 
-    <main class="relative z-10 w-full max-w-lg">
-        <div class="glass rounded-[3rem] p-8 md:p-14 shadow-2xl text-center space-y-12 relative overflow-hidden">
-            
-            <!-- Tarama Efekti -->
-            <div class="scanner-line animate-scan"></div>
-
-            <!-- Merkezi İkon -->
-            <div class="flex justify-center">
-                <div class="relative">
-                    <div class="w-20 h-20 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center animate-float">
-                        <i class="fas fa-layer-group text-3xl text-rose-400"></i>
-                    </div>
-                    <!-- Küçük Sinyal Noktası -->
-                    <div class="absolute -top-1 -right-1 flex h-4 w-4">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-4 w-4 bg-rose-500 border-2 border-slate-900"></span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ana Metin -->
-            <div class="space-y-4">
-                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight font-mono uppercase">
-                    Erişim <span class="text-rose-400">Kısıtlı</span>
-                </h1>
-                <p class="text-slate-400 text-sm md:text-base font-light leading-relaxed max-w-xs mx-auto">
-                    Yeni nesil deneyim için protokoller hazırlanıyor. Veri yapılandırması devam ediyor...
-                </p>
-            </div>
-
-            <!-- Geliştiriliyor Rozeti -->
-            <div class="inline-flex items-center space-x-3 px-6 py-2 bg-rose-500/10 rounded-full border border-rose-500/20">
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-rose-400">Geliştiriliyor</span>
-            </div>
-
-            <!-- İlerleme Çubuğu -->
-            <div class="space-y-4 pt-2">
-                <div class="flex justify-between text-[10px] uppercase font-bold tracking-widest text-slate-500">
-                    <span class="animate-pulse">Sistem Optimizasyonu</span>
-                    <span>%94</span>
-                </div>
-                <div class="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
-                    <div class="w-[94%] h-full bg-gradient-to-r from-rose-500 to-purple-600 shadow-[0_0_15px_rgba(244,63,94,0.5)]"></div>
-                </div>
-                <div class="flex justify-center space-x-2">
-                    <div class="h-1 w-1 bg-rose-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-                    <div class="h-1 w-1 bg-rose-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                    <div class="h-1 w-1 bg-rose-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
-                </div>
-            </div>
-
-            <!-- Teknik İkonlar -->
-            <div class="flex justify-center space-x-8 text-slate-500 pt-4">
-                <i class="fas fa-terminal text-xs hover:text-rose-400 transition-colors"></i>
-                <i class="fas fa-microchip text-xs hover:text-rose-400 transition-colors"></i>
-                <i class="fas fa-database text-xs hover:text-rose-400 transition-colors"></i>
-            </div>
-
+    <!-- GİRİŞ EKRANI -->
+    <main id="authScreen" class="w-full max-w-lg flex flex-col items-center space-y-10 animate-float">
+        
+        <!-- Üst Başlık -->
+        <div class="text-center">
+            <p class="text-[10px] tracking-[0.6em] uppercase font-bold text-gray-400 mb-2">Concept for Benna</p>
+            <h1 class="font-serif italic text-6xl text-gray-900 leading-tight">Giriş Yap</h1>
         </div>
 
-        <!-- Alt Bilgi (Anonim) -->
-        <p class="mt-10 text-center text-[9px] text-slate-600 uppercase tracking-[0.6em]">
-            Digital Assets // Terminal 2026
-        </p>
+        <!-- Karakterler -->
+        <div class="flex items-end justify-center gap-6 h-16">
+            <div class="char" id="char1">
+                <div class="char-body char-purple">
+                    <div class="flex gap-2">
+                        <div class="eye"><div class="pupil"></div></div>
+                        <div class="eye"><div class="pupil"></div></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+            <div class="char" id="char2">
+                <div class="char-body char-orange">
+                    <div class="flex gap-2">
+                        <div class="eye"><div class="pupil"></div></div>
+                        <div class="eye"><div class="pupil"></div></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+            <div class="char" id="char3">
+                <div class="char-body char-dark">
+                    <div class="flex gap-2">
+                        <div class="eye"><div class="pupil"></div></div>
+                        <div class="eye"><div class="pupil"></div></div>
+                    </div>
+                    <div class="mouth"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Şifre Paneli -->
+        <div class="w-full space-y-8 bg-white/40 backdrop-blur-xl p-10 rounded-[40px] border border-white/60 shadow-2xl shadow-indigo-500/5">
+            
+            <div class="space-y-6">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-[11px] font-bold uppercase tracking-widest text-gray-500">Erişim Şifresi</span>
+                    <span class="text-[11px] font-mono text-gray-400 italic">Güvenli Bağlantı</span>
+                </div>
+
+                <div class="password-input-wrapper" id="inputContainer">
+                    <input type="password" id="passInput" placeholder="Şifreyi giriniz..." 
+                           class="bg-transparent border-none outline-none w-full py-2 px-1 text-gray-800 placeholder-gray-400 font-medium">
+                    <button id="toggleBtn" class="text-gray-400 hover:text-gray-600 transition-colors px-2">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    </button>
+                </div>
+
+                <button id="submitBtn" class="w-full bg-gray-900 text-white py-4 rounded-2xl font-bold tracking-widest uppercase text-xs hover:bg-black transition-all transform hover:scale-[1.02] active:scale-95 shadow-xl shadow-black/10">
+                    Sistemi Aç
+                </button>
+            </div>
+        </div>
     </main>
 
+    <!-- ANA SAYFA (ALARM / GERİ SAYIM) -->
+    <main id="mainContent" class="countdown-container flex-col items-center space-y-12 w-full max-w-4xl">
+        <div class="text-center space-y-4">
+            <div class="inline-block px-4 py-1 rounded-full border border-indigo-100 bg-white/50 text-[10px] font-bold tracking-widest text-indigo-500 uppercase mb-4 animate-pulse-soft">
+                Etkinlik Alarmı Kuruldu
+            </div>
+            <h2 class="font-serif italic text-7xl md:text-8xl text-gray-900 leading-none">27 Temmuz 2026</h2>
+            <p class="text-gray-400 font-light tracking-[0.4em] uppercase text-[10px]">Geri Sayım Başlatıldı</p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-6 md:gap-10">
+            <div class="countdown-card">
+                <span id="days" class="block text-6xl font-bold text-gray-900 tabular-nums">00</span>
+                <span class="text-[10px] uppercase tracking-widest font-bold text-gray-400 mt-2 block">Gün</span>
+            </div>
+            <div class="countdown-card">
+                <span id="hours" class="block text-6xl font-bold text-gray-900 tabular-nums">00</span>
+                <span class="text-[10px] uppercase tracking-widest font-bold text-gray-400 mt-2 block">Saat</span>
+            </div>
+            <div class="countdown-card">
+                <span id="minutes" class="block text-6xl font-bold text-gray-900 tabular-nums">00</span>
+                <span class="text-[10px] uppercase tracking-widest font-bold text-gray-400 mt-2 block">Dakika</span>
+            </div>
+            <div class="countdown-card border-indigo-200 shadow-indigo-500/5">
+                <span id="seconds" class="block text-6xl font-bold text-indigo-600 tabular-nums">00</span>
+                <span class="text-[10px] uppercase tracking-widest font-bold text-indigo-400 mt-2 block">Saniye</span>
+            </div>
+        </div>
+
+        <div class="pt-8 opacity-40">
+            <div class="w-24 h-[1px] bg-gray-400 mx-auto"></div>
+            <p class="mt-6 text-[9px] tracking-[0.8em] font-bold text-gray-400 uppercase text-center">
+                Tüm Veriler Hazırlanıyor // Benna Project
+            </p>
+        </div>
+    </main>
+
+    <footer id="footerText" class="fixed bottom-8 text-[9px] tracking-[0.8em] font-bold text-gray-300">
+        PRIVATE ACCESS ONLY // 2026
+    </footer>
+
+    <script>
+        const passInput = document.getElementById('passInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleBtn = document.getElementById('toggleBtn');
+        const inputContainer = document.getElementById('inputContainer');
+        const authScreen = document.getElementById('authScreen');
+        const mainContent = document.getElementById('mainContent');
+        const footerText = document.getElementById('footerText');
+        const chars = document.querySelectorAll('.char-body');
+        const eyeIcon = document.getElementById('eyeIcon');
+        
+        let isVisible = false;
+
+        // Göz Takibi
+        document.addEventListener('mousemove', e => {
+            if (isVisible) return; 
+
+            chars.forEach(char => {
+                const pupils = char.querySelectorAll('.pupil');
+                const eyes = char.querySelectorAll('.eye');
+                const rect = char.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const rot = (e.clientX - centerX) / 40;
+                char.style.transform = `rotate(${rot}deg)`;
+
+                eyes.forEach((eye, i) => {
+                    const eRect = eye.getBoundingClientRect();
+                    const eCX = eRect.left + eRect.width / 2;
+                    const eCY = eRect.top + eRect.height / 2;
+                    const dx = e.clientX - eCX;
+                    const dy = e.clientY - eCY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const move = Math.min(3, dist / 50);
+                    pupils[i].style.transform = `translate(${(dx / dist) * move}px, ${(dy / dist) * move}px)`;
+                });
+            });
+        });
+
+        // Şifre Gizle/Göster
+        toggleBtn.addEventListener('click', () => {
+            isVisible = !isVisible;
+            passInput.type = isVisible ? 'text' : 'password';
+            
+            if (isVisible) {
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        });
+
+        // Geri Sayım Mantığı
+        function startCountdown() {
+            const targetDate = new Date("July 27, 2026 00:00:00").getTime();
+            
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                const d = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const h = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById("days").innerText = d.toString().padStart(2, '0');
+                document.getElementById("hours").innerText = h.toString().padStart(2, '0');
+                document.getElementById("minutes").innerText = m.toString().padStart(2, '0');
+                document.getElementById("seconds").innerText = s.toString().padStart(2, '0');
+
+                if (distance < 0) {
+                    clearInterval(timer);
+                    document.querySelector(".countdown-container").innerHTML = "<h2 class='text-4xl font-serif italic'>GÜN GELDİ!</h2>";
+                }
+            }, 1000);
+        }
+
+        // Form Gönderimi
+        submitBtn.addEventListener('click', () => {
+            if (passInput.value === "specialforbenna") {
+                // Şifre Ekranını Kapat ve Ana Sayfayı Aç
+                authScreen.style.transition = "all 0.8s cubic-bezier(0.77, 0, 0.175, 1)";
+                authScreen.style.opacity = "0";
+                authScreen.style.transform = "scale(0.9) translateY(-20px)";
+                
+                setTimeout(() => {
+                    authScreen.style.display = "none";
+                    mainContent.classList.add('active-screen');
+                    startCountdown();
+                }, 800);
+            } else {
+                inputContainer.classList.add('animate-shake');
+                inputContainer.style.borderColor = "#ef4444";
+                chars.forEach(c => c.querySelector('.mouth').classList.add('sad'));
+                
+                setTimeout(() => {
+                    inputContainer.classList.remove('animate-shake');
+                    inputContainer.style.borderColor = "";
+                    chars.forEach(c => c.querySelector('.mouth').classList.remove('sad'));
+                }, 1000);
+            }
+        });
+    </script>
 </body>
 </html>
